@@ -1,3 +1,7 @@
+###> vinylo/local ###
+.DS_Store
+.idea/
+###< vinylo/local ###
 
 ###> symfony/framework-bundle ###
 /.env.local
