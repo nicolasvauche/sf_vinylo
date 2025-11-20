@@ -1,6 +1,8 @@
 ###> vinylo/local ###
 .DS_Store
 .idea/
+vinylo.crt
+vinylo.key
 ###< vinylo/local ###
 
 ###> symfony/framework-bundle ###
@@ -22,3 +24,7 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> symfonycasts/sass-bundle ###
+/public/assets/
+###< symfonycasts/sass-bundle ###
