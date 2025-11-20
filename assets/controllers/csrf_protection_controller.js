@@ -22,7 +22,7 @@ document.addEventListener('turbo:submit-end', function (event) {
     removeCsrfToken(event.detail.formSubmission.formElement);
 });
 
-export function generateCsrfToken (formElement) {
+export function generateCsrfToken(formElement) {
     const csrfField = formElement.querySelector('input[data-controller="csrf-protection"], input[name="_csrf_token"]');
 
     if (!csrfField) {
@@ -36,7 +36,7 @@ export function generateCsrfToken (formElement) {
         csrfField.setAttribute('data-csrf-protection-cookie-value', csrfCookie = csrfToken);
         csrfField.defaultValue = csrfToken = btoa(String.fromCharCode.apply(null, (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(18))));
     }
-    csrfField.dispatchEvent(new Event('change', { bubbles: true }));
+    csrfField.dispatchEvent(new Event('change', {bubbles: true}));
 
     if (csrfCookie && tokenCheck.test(csrfToken)) {
         const cookie = csrfCookie + '_' + csrfToken + '=' + csrfCookie + '; path=/; samesite=strict';
@@ -44,7 +44,7 @@ export function generateCsrfToken (formElement) {
     }
 }
 
-export function generateCsrfHeaders (formElement) {
+export function generateCsrfHeaders(formElement) {
     const headers = {};
     const csrfField = formElement.querySelector('input[data-controller="csrf-protection"], input[name="_csrf_token"]');
 
@@ -61,7 +61,7 @@ export function generateCsrfHeaders (formElement) {
     return headers;
 }
 
-export function removeCsrfToken (formElement) {
+export function removeCsrfToken(formElement) {
     const csrfField = formElement.querySelector('input[data-controller="csrf-protection"], input[name="_csrf_token"]');
 
     if (!csrfField) {
