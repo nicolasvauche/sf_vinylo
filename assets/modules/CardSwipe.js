@@ -23,7 +23,7 @@ export default class CardSwipe {
 
     initEventListeners() {
         this.card.addEventListener('mousedown', this.startDrag.bind(this));
-        this.card.addEventListener('touchstart', this.startDrag.bind(this));
+        this.card.addEventListener('touchstart', this.startDrag.bind(this), {passive: false});
         this.card.addEventListener('transitionend', this.removeResetClass.bind(this));
 
         window.addEventListener('pageshow', (e) => {
@@ -55,7 +55,7 @@ export default class CardSwipe {
     }
 
     startDrag(e) {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
 
         const currentTag = e.target;
 
@@ -83,13 +83,16 @@ export default class CardSwipe {
             this.startY = e.touches[0].clientY;
         }
 
+        this.card.style.transition = 'none';
+        this.card.style.willChange = 'transform';
+
         this.card.classList.add('dragging');
         this.card.style.touchAction = 'pan-y';
 
         document.addEventListener('mousemove', this.dragBound);
         document.addEventListener('touchmove', this.dragBound, {passive: false});
-        document.addEventListener('mouseup', this.stopDragBound);
-        document.addEventListener('touchend', this.stopDragBound);
+        document.addEventListener('mouseup', this.stopDragBound, {passive: false});
+        document.addEventListener('touchend', this.stopDragBound, {passive: false});
     }
 
     drag(e) {
@@ -122,7 +125,7 @@ export default class CardSwipe {
                     // axe horizontal
                     this.lockedAxis = 'x';
                 } else {
-                    // axe vertical
+                    // axe vertical (haut uniquement)
                     if (dy < 0) {
                         this.lockedAxis = 'y';
                     } else {
@@ -143,7 +146,7 @@ export default class CardSwipe {
         if (this.lockedAxis === 'x') {
             const thresholdPx = this.threshold * this.container.offsetWidth;
 
-            this.card.style.transform = `translateX(${dx}px) rotate(${dx / 60}deg)`;
+            this.card.style.transform = `translate3d(${dx}px,0,0) rotate(${dx / 60}deg)`;
 
             if (dx > thresholdPx) {
                 this.action = 'play';
@@ -170,7 +173,7 @@ export default class CardSwipe {
                 return;
             }
 
-            this.card.style.transform = `translateY(${effectiveDy}px)`;
+            this.card.style.transform = `translate3d(0,${effectiveDy}px,0)`;
 
             if (!this.playOnly && effectiveDy < -thresholdPx) {
                 this.action = 'view';
@@ -226,14 +229,16 @@ export default class CardSwipe {
         document.removeEventListener('touchmove', this.dragBound);
         document.removeEventListener('mouseup', this.stopDragBound);
         document.removeEventListener('touchend', this.stopDragBound);
+
+        this.card.style.willChange = '';
     }
 
     resetCard() {
-        this.card.style.transition = 'transform 0.3s';
+        this.card.style.transition = 'transform 0.25s ease-out';
         this.card.style.transform = '';
         setTimeout(() => {
             this.card.style.transition = '';
-        }, 300);
+        }, 250);
         this.container.style.overflow = 'visible';
     }
 
