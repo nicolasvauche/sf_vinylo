@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vinylo{% endblock %}
+
+{% block body %}
+    <header class="app-header">
+        <a href="{{ path('app_flow') }}">
+            <img src="{{ asset('img/logo_flow.png') }}" alt="Flow"/>
+            Flow
+        </a>
+
+        <div class="app-sitename">
+            <h1>Vinylo</h1>
+        </div>
+
+        <a href="{{ path('app_vault') }}">
+            <img src="{{ asset('img/logo_vault.png') }}" alt="Vault"/>
+            Vault
+        </a>
+    </header>
+{% endblock %}

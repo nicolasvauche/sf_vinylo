@@ -1,0 +1,28 @@
+.app-swipe {
+  transition: transform 0.9s;
+  cursor: grab;
+
+  &.dragging {
+    cursor: grabbing;
+  }
+
+  &.swipe-right {
+    transform: translateX(300%);
+    transition-duration: 0.9s;
+  }
+
+  &.swipe-left {
+    transform: translateX(-300%);
+    transition-duration: 0.9s;
+  }
+
+  &.swipe-up {
+    transform: translateY(-300%) translateX(0);
+    transition-duration: 0.9s;
+  }
+
+  &.reset {
+    transition: transform 0.3s ease-out;
+    transform: translateX(0) translateY(0) rotate(0);
+  }
+}

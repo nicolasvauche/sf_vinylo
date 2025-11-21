@@ -1,0 +1,24 @@
+.app-header {
+    .right {
+        & > a {
+            font-size: 1rem;
+            color: $vault-secondary;
+
+            & > img {
+                width: 4rem;
+            }
+        }
+    }
+
+    .app-sitename {
+        .app-account {
+            & > a {
+                color: $vault-secondary;
+            }
+        }
+
+        & > p {
+            color: $vault-primary;
+        }
+    }
+}

@@ -1,0 +1,4 @@
+.app-main {
+    @include displayFlex(null, null, null, column);
+    flex: 1;
+}

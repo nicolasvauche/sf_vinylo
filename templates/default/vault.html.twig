@@ -1,0 +1,39 @@
+{% extends '_layout/vault/_index.html.twig' %}
+
+{% block title %}Vault{% endblock %}
+
+{% block main %}
+    <section class="app-section headline">
+        <p>Votre collection est vide…</p>
+    </section>
+
+    <main class="app-main">
+        <div class="app-collection app-swipe"
+             id="swipe-container"
+             data-controller="catalog--swipe"
+             data-page="1"
+             data-pages="10"
+             data-url="/">
+            {% for i in 1..6 %}
+                <div class="app-card">
+                    <a href="#" class="playlist" title="Ajouter à une Playlist">
+                        {{ ux_icon('material-symbols:playlist-add-rounded', {'class': 'app-icon'}) }}
+                    </a>
+                    <a href="{{ path('app_disk_details') }}">
+                        <img src="{{ asset('img/cover.jpg') }}" class="cover" alt="Disque exemple"/>
+                    </a>
+                    <div class="infos">
+                        <div class="details">
+                            <h2>Legend - The Best Of Bob Marley And The Wailers</h2>
+                            <h3>
+                                <a href="#">Bob Marley & The Wailers</a>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% include "_layout/vault/_pagination.html.twig" %}
+    </main>
+{% endblock %}

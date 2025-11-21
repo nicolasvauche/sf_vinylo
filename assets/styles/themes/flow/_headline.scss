@@ -1,0 +1,17 @@
+.app-section {
+    &.headline {
+        margin-top: 0.5rem;
+
+        .app-links {
+            & > a {
+                color: $flow-secondary;
+                background-color: $flow-third;
+
+                &.active {
+                    color: $white;
+                    background-color: $flow-fourth;
+                }
+            }
+        }
+    }
+}

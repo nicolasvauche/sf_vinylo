@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block bodyclass %}vault{% endblock %}
+
+{% block body %}
+    {% include "_layout/vault/_header.html.twig" %}
+
+    {% block main %}{% endblock %}
+
+    {% include "_layout/vault/_navigation.html.twig" %}
+{% endblock %}

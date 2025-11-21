@@ -1,0 +1,24 @@
+.app-section {
+    &.disk {
+        &.no-animate {
+            transition: none !important;
+        }
+
+        .infos {
+            .notes {
+                ul {
+                    li {
+                        .app-icon {
+                            color: $flow-fourth;
+                        }
+                    }
+                }
+            }
+
+            .playlist {
+                color: $white;
+                background-color: $flow-secondary;
+            }
+        }
+    }
+}

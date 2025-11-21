@@ -1,0 +1,26 @@
+.app-header {
+    .left {
+        & > a {
+            font-size: 1rem;
+            color: $flow-secondary;
+
+            & > img {
+                width: 4rem;
+            }
+        }
+    }
+
+    .app-sitename {
+        .app-links {
+            & > a {
+                color: $flow-primary;
+            }
+        }
+
+        .app-account {
+            & > a {
+                color: $flow-secondary;
+            }
+        }
+    }
+}

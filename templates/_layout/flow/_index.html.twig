@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block bodyclass %}flow{% endblock %}
+
+{% block body %}
+    {% include "_layout/flow/_header.html.twig" %}
+
+    {% block main %}{% endblock %}
+
+    {% include "_layout/flow/_footer.html.twig" %}
+{% endblock %}

@@ -1,0 +1,36 @@
+@use "sass:map";
+
+@mixin displayFlex($justify: null, $align: null, $gap: null, $direction: null) {
+    display: flex;
+    flex-direction: $direction;
+    justify-content: $justify;
+    align-items: $align;
+    gap: $gap;
+}
+
+@mixin displayGrid($columns: 1fr, $gap: null, $rows: null) {
+    display: grid;
+    grid-template-columns: $columns;
+    grid-template-rows: $rows;
+    grid-gap: $gap;
+}
+
+@mixin respondTo($breakpoint) {
+    @if $breakpoint == xs {
+        @media (max-width: 767px) {
+            @content;
+        }
+    }
+
+    @if $breakpoint == sm {
+        @media (min-width: 768px) {
+            @content;
+        }
+    }
+
+    @if $breakpoint == md {
+        @media (min-width: 1025px) {
+            @content;
+        }
+    }
+}

@@ -1,0 +1,99 @@
+&.disk {
+    position: relative;
+    overflow: hidden;
+    height: calc(100dvh - 12.25rem);
+    border-radius: 1rem;
+    box-shadow: 1px 1px 2px rgba($black, 0.85);
+    transition: transform 0.9s;
+    cursor: grab;
+    user-select: none;
+
+    &.dragging {
+        cursor: grabbing;
+    }
+
+    &.swipe-right {
+        transform: translateX(300%);
+        transition-duration: 0.9s;
+    }
+
+    &.swipe-left {
+        transform: translateX(-300%);
+        transition-duration: 0.9s;
+    }
+
+    &.swipe-up {
+        transform: translateY(-300%) translateX(0);
+        transition-duration: 0.9s;
+    }
+
+    &.reset {
+        transition-duration: 0.9s;
+    }
+
+    & > img {
+        height: calc(100vh - 12.25rem);
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .infos {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0.5rem;
+        background-color: rgba($flow_third, 0.9);
+
+        & > header {
+            @include displayGrid(1fr 2.25rem, 0.5rem);
+            align-items: start;
+
+            .playlist {
+                padding: 0.5rem;
+                text-align: center;
+                border-radius: 0.5rem;
+                box-shadow: 1px 1px 2px rgba($black, 0.75);
+
+                &:active {
+                    box-shadow: inset 1px 1px 2px rgba($black, 0.75);
+                }
+
+                .app-icon {
+                    font-size: 1.25rem;
+                }
+            }
+        }
+
+        .notes {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            background-color: rgba($white, 0.75);
+            border-radius: 0.5rem;
+            box-shadow: inset 1px 1px 2px rgba($black, 0.85);
+
+            p {
+                margin: 0 0 0.25rem;
+            }
+
+            ul {
+                margin-left: 0.5rem;
+
+                li {
+                    @include displayFlex(null, center, 0.25rem);
+                    margin-bottom: 0.25rem;
+                    font-style: italic;
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+
+                    .app-icon {
+                        width: 1rem;
+                    }
+                }
+            }
+        }
+    }
+}

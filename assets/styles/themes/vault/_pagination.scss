@@ -1,0 +1,31 @@
+.app-pagination {
+    @include displayFlex(space-between, center, 1rem);
+    padding: 1rem 0.5rem 0;
+
+    .left,
+    .center,
+    .right {
+        @include displayFlex(center, center, 0.75rem);
+    }
+
+    .button {
+        @include displayFlex(center, center);
+        aspect-ratio: 1 / 1;
+        padding: 0.25rem;
+        width: 1rem;
+        font-size: 1rem;
+        color: $vault-secondary;
+        background-color: transparent;
+        border-radius: 50%;
+
+        &.active {
+            font-weight: bold;
+            color: $vault-fourth;
+        }
+
+        &.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+}

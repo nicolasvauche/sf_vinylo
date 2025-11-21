@@ -1,0 +1,59 @@
+.app-collection {
+    @include displayGrid(repeat(2, 1fr), 1rem);
+    flex: 1;
+
+    .app-card {
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        border-radius: 1rem;
+        box-shadow: 1px 1px 2px rgba($black, 0.85);
+
+        .playlist {
+            position: absolute;
+            right: 0.5rem;
+            top: 0.5rem;
+            z-index: 9999;
+            padding: 0.25rem;
+            text-align: center;
+            background-color: $vault-secondary;
+            border-radius: 0.5rem;
+            box-shadow: 1px 1px 2px rgba($black, 0.75);
+
+            &:active {
+                box-shadow: inset 1px 1px 2px rgba($black, 0.75);
+            }
+
+            .app-icon {
+                font-size: 1.25rem;
+            }
+        }
+
+        .cover {
+            display: block;
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .infos {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 0.5rem;
+            background-color: rgba($flow_third, 0.95);
+
+            .details {
+                h2 {
+                    font-size: 0.75rem;
+                }
+
+                h3 {
+                    font-size: 0.75rem;
+                    font-weight: initial;
+                }
+            }
+        }
+    }
+}

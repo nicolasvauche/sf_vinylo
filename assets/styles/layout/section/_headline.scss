@@ -1,0 +1,31 @@
+&.headline {
+    text-align: center;
+
+    .app-links {
+        @include displayFlex(space-between, center, 1rem);
+        flex-wrap: wrap;
+        margin: 0 1.5rem;
+        font-size: 0.85rem;
+
+        & > a {
+            @include displayFlex(center, center, 0.25rem);
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 0.5rem;
+            box-shadow: 1px 1px 2px rgba($black, 0.75);
+
+            &:active {
+                box-shadow: inset 1px 1px 2px rgba($black, 0.75);
+            }
+        }
+
+        .moment {
+            margin-bottom: 0;
+            width: 100%;
+            font-style: italic;
+        }
+    }
+}

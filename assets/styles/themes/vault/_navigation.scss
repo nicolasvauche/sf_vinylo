@@ -1,0 +1,27 @@
+.app-navigation {
+    @include displayGrid(repeat(5, 1fr));
+
+    & > a {
+        @include displayFlex(center, center, 0.25rem, column);
+        padding: 0.5rem 0.5rem 1rem;
+        font-size: 0.6rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: $vault-primary;
+
+        &:last-child {
+            color: $vault-third;
+            background-color: $success;
+            border-top-left-radius: 1rem;
+        }
+
+        &.active {
+            color: $vault-fourth;
+            background-color: transparent;
+        }
+
+        .app-icon {
+            font-size: 2.5rem;
+        }
+    }
+}

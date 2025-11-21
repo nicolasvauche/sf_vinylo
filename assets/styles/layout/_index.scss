@@ -1,0 +1,40 @@
+html {
+    max-width: 380px;
+    background-color: $black;
+
+    @include respondTo(md) {
+        margin: 0 auto;
+    }
+
+    body {
+        overflow: hidden;
+        height: 100dvh;
+        font-family: $font-primary;
+        color: $black;
+        background-color: $white;
+
+        @include respondTo(xs) {
+            width: 100dvw;
+        }
+
+        @import "./header";
+        @import "./main";
+        @import "./section";
+
+        @import "../themes/default";
+
+        &.flow {
+            @import "../themes/flow";
+        }
+
+        &.vault {
+            @include displayFlex(null, null, null, column);
+            @import "../themes/vault";
+        }
+
+        &.profile {
+            @include displayFlex(null, null, null, column);
+            @import "../themes/profile";
+        }
+    }
+}

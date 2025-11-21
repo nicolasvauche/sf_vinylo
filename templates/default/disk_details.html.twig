@@ -1,0 +1,43 @@
+{% extends '_layout/vault/_index.html.twig' %}
+
+{% block title %}Détails d'un disque{% endblock %}
+
+{% block main %}
+    <main class="app-main app-cards" data-controller="card--swipe">
+        <section class="app-section disk app-card" data-id="1" data-from="vault">
+            <img src="{{ asset('img/cover.jpg') }}" alt="Disque"/>
+
+            <div class="infos">
+                <header>
+                    <div class="details">
+                        <h2>Legend - The Best Of Bob Marley And The Wailers</h2>
+                        <h3>
+                            <a href="#">Bob Marley & The Wailers</a>
+                        </h3>
+                    </div>
+                    <a href="#" class="playlist" title="Ajouter à une Playlist">
+                        {{ ux_icon('material-symbols:playlist-add-rounded', {'class': 'app-icon'}) }}
+                    </a>
+                </header>
+
+                <div class="notes">
+                    <p><strong>Flow</strong> proposera ce disque si :</p>
+                    <ul>
+                        <li>
+                            {{ ux_icon('fa6-solid:hand-point-right', {'class': 'app-icon'}) }}
+                            Votre humeur est "calme" ou "doux"
+                        </li>
+                        <li>
+                            {{ ux_icon('fa6-solid:hand-point-right', {'class': 'app-icon'}) }}
+                            Vous appréciez souvent revenir à des classiques
+                        </li>
+                        <li>
+                            {{ ux_icon('fa6-solid:hand-point-right', {'class': 'app-icon'}) }}
+                            La saison demande des sonorités chaleureuses
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}

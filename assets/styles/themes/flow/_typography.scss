@@ -1,0 +1,13 @@
+h2 {
+    color: $flow-primary;
+    text-shadow: 1px 1px 1px rgba($white, 0.5);
+}
+
+h3 {
+    color: $flow-primary;
+
+    & > a {
+        color: $flow-secondary;
+        text-shadow: 1px 1px 1px rgba($white, 0.5);
+    }
+}
