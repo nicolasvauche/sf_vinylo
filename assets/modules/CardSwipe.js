@@ -26,16 +26,13 @@ export default class CardSwipe {
         this.card.addEventListener('touchstart', this.startDrag.bind(this));
         this.card.addEventListener('transitionend', this.removeResetClass.bind(this));
 
-        // --- Anti "rewind" au retour depuis l'historique (bfcache inclus)
         window.addEventListener('pageshow', (e) => {
             const comingBack = sessionStorage.getItem('noRewind') === '1' || e.persisted;
             if (comingBack) {
-                // état neutre sans animation
                 this.card.style.transition = 'none';
                 this.card.style.transform = 'none';
                 this.card.classList.remove('swipe-left', 'swipe-right', 'swipe-up', 'dragging');
 
-                // réactive les transitions au prochain frame
                 requestAnimationFrame(() => {
                     this.card.style.transition = '';
                     sessionStorage.removeItem('noRewind');
@@ -43,7 +40,6 @@ export default class CardSwipe {
             }
         });
 
-        // Filet de sécurité si la page n'est pas mise en cache
         window.addEventListener('pagehide', () => {
             this.card.style.transition = 'none';
             this.card.style.transform = 'none';
@@ -51,7 +47,6 @@ export default class CardSwipe {
         });
     }
 
-    // Reset instantané avant de changer de page / revenir en arrière
     instantResetForNav() {
         this.card.style.transition = 'none';
         this.card.style.transform = 'none';
@@ -64,7 +59,6 @@ export default class CardSwipe {
 
         const currentTag = e.target;
 
-        // Gestion des clics sur les liens / icônes
         if (currentTag.tagName.toLowerCase() === 'i') {
             if (currentTag.parentNode.tagName.toLowerCase() === 'span') {
                 if (currentTag.parentNode.parentNode.tagName.toLowerCase() === 'a') {
@@ -128,7 +122,7 @@ export default class CardSwipe {
                     // axe horizontal
                     this.lockedAxis = 'x';
                 } else {
-                    // axe vertical : on n'accepte QUE vers le haut
+                    // axe vertical
                     if (dy < 0) {
                         this.lockedAxis = 'y';
                     } else {
@@ -142,7 +136,6 @@ export default class CardSwipe {
 
         this.container.style.overflow = 'hidden';
 
-        // Reset visuels
         this.card.classList.remove('swipe-right', 'swipe-left', 'swipe-up');
         this.action = null;
 
@@ -153,11 +146,9 @@ export default class CardSwipe {
             this.card.style.transform = `translateX(${dx}px) rotate(${dx / 60}deg)`;
 
             if (dx > thresholdPx) {
-                // swipe droite → play
                 this.action = 'play';
                 this.card.classList.add('swipe-right');
             } else if (dx < -thresholdPx) {
-                // swipe gauche → cancel
                 if (this.from !== 'playlist' && !this.playOnly) {
                     this.action = 'cancel';
                     this.card.classList.add('swipe-left');
@@ -182,7 +173,6 @@ export default class CardSwipe {
             this.card.style.transform = `translateY(${effectiveDy}px)`;
 
             if (!this.playOnly && effectiveDy < -thresholdPx) {
-                // swipe haut → view
                 this.action = 'view';
                 this.card.classList.add('swipe-up');
             }
@@ -296,7 +286,6 @@ export default class CardSwipe {
     }
 
     goback(e) {
-        // IMPORTANT : pas d'anim de sortie → reset instantané + flag
         this.instantResetForNav();
 
         if (document.referrer && document.referrer !== window.location.href) {

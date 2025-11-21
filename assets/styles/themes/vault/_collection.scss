@@ -2,6 +2,24 @@
     @include displayGrid(repeat(2, 1fr), 1rem);
     flex: 1;
 
+    &.dragging {
+        cursor: grabbing;
+    }
+
+    &.swipe-right {
+        transform: translateX(300%);
+        transition-duration: 0.9s;
+    }
+
+    &.swipe-left {
+        transform: translateX(-300%);
+        transition-duration: 0.9s;
+    }
+
+    &.reset {
+        transition-duration: 0.9s;
+    }
+
     .app-card {
         position: relative;
         overflow: hidden;

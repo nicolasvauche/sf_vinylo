@@ -19,6 +19,7 @@ export default class CatalogSwipe {
 
     startDrag(e) {
         this.isDragging = true;
+        this.container.classList.add('dragging');
 
         if (e.type === 'mousedown') {
             this.startX = e.clientX;
@@ -78,13 +79,13 @@ export default class CatalogSwipe {
             this.container.classList.remove('swipe-right', 'swipe-left');
             this.action = null;
         }
-        this.isAnimating = false;
     }
 
     stopDrag(e) {
         if (!this.isDragging) return;
 
         this.isDragging = false;
+        this.container.classList.remove('dragging');
         this.container.style.touchAction = '';
 
         if (this.action === 'previous') {
@@ -93,7 +94,6 @@ export default class CatalogSwipe {
             this.next();
         }
 
-        // Reset the container position and classes with a smooth transition
         this.container.style.transition = 'transform 0.3s ease-out';
         this.container.style.transform = '';
         this.action = null;
