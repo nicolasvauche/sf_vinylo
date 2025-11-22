@@ -271,7 +271,7 @@ export default class CardSwipe {
             }, 500);
         }, 500);
 
-        window.location.href = '/disque/details';
+        window.location.href = '/vault/disque/details';
     }
 
     play(e) {
@@ -293,8 +293,13 @@ export default class CardSwipe {
     goback(e) {
         this.instantResetForNav();
 
-        if (document.referrer && document.referrer !== window.location.href) {
-            history.back();
+        const ref = document.referrer || '';
+        console.log(ref);
+
+        if (ref.includes('/vault')) {
+            window.location.href = '/vault';
+        } else if (ref.includes('/flow')) {
+            window.location.href = '/flow';
         } else {
             window.location.href = '/flow';
         }

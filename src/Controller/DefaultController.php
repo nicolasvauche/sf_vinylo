@@ -20,7 +20,7 @@ final class DefaultController extends AbstractController
         return $this->render('default/vault.html.twig');
     }
 
-    #[Route('/disque/details', name: 'app_disk_details')]
+    #[Route('/vault/disque/details', name: 'app_disk_details')]
     public function details(): Response
     {
         return $this->render('default/disk_details.html.twig');
