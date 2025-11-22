@@ -1,0 +1,12 @@
+.app-feedback {
+    color: $vault-primary;
+    background-color: rgba($vault-third, 0.85);
+
+    &.top {
+        color: $danger;
+    }
+
+    &.right {
+        color: $info;
+    }
+}

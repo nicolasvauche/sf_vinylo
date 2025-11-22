@@ -1,0 +1,12 @@
+.app-feedback {
+    color: $flow-primary;
+    background-color: rgba($flow-third, 0.85);
+
+    &.top {
+        color: $info;
+    }
+
+    &.right {
+        color: $success;
+    }
+}

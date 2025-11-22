@@ -1,8 +1,19 @@
 export default class CardSwipe {
-    constructor(containerSelector, cardElement, feedbackElementId, threshold, from, playOnly) {
+    constructor(containerSelector, cardElement, feedbackElements, threshold, from, playOnly) {
         this.container = document.querySelector(containerSelector);
         this.card = cardElement;
         this.threshold = threshold;
+
+        this.feedbackMap = new Map();
+        if (Array.isArray(feedbackElements)) {
+            feedbackElements.forEach((name) => {
+                const el = document.querySelector(`.app-feedback.${name}`);
+                if (el) {
+                    if (el.parentNode !== document.body) document.body.appendChild(el);
+                    this.feedbackMap.set(name, el);
+                }
+            });
+        }
 
         this.from = from;
         this.playOnly = playOnly === true || playOnly === 'true';
@@ -17,8 +28,24 @@ export default class CardSwipe {
 
         this.lockedAxis = null;
         this.lockThreshold = 10;
+        this.EPS = 2;
+        this.lastDx = 0;
+        this.lastDy = 0;
 
         this.initEventListeners();
+    }
+
+    setActiveFeedback(name) {
+        if (!this.feedbackMap.size) return;
+        for (const [key, el] of this.feedbackMap) {
+            if (key === name) el.classList.add('active');
+            else el.classList.remove('active');
+        }
+    }
+
+    clearFeedback() {
+        if (!this.feedbackMap.size) return;
+        for (const el of this.feedbackMap.values()) el.classList.remove('active');
     }
 
     initEventListeners() {
@@ -32,7 +59,7 @@ export default class CardSwipe {
                 this.card.style.transition = 'none';
                 this.card.style.transform = 'none';
                 this.card.classList.remove('swipe-left', 'swipe-right', 'swipe-up', 'dragging');
-
+                this.clearFeedback();
                 requestAnimationFrame(() => {
                     this.card.style.transition = '';
                     sessionStorage.removeItem('noRewind');
@@ -44,6 +71,7 @@ export default class CardSwipe {
             this.card.style.transition = 'none';
             this.card.style.transform = 'none';
             this.card.classList.remove('swipe-left', 'swipe-right', 'swipe-up', 'dragging');
+            this.clearFeedback();
         });
     }
 
@@ -51,6 +79,7 @@ export default class CardSwipe {
         this.card.style.transition = 'none';
         this.card.style.transform = 'none';
         this.card.classList.remove('swipe-left', 'swipe-right', 'swipe-up', 'dragging');
+        this.clearFeedback();
         sessionStorage.setItem('noRewind', '1');
     }
 
@@ -58,7 +87,6 @@ export default class CardSwipe {
         if (e.cancelable) e.preventDefault();
 
         const currentTag = e.target;
-
         if (currentTag.tagName.toLowerCase() === 'i') {
             if (currentTag.parentNode.tagName.toLowerCase() === 'span') {
                 if (currentTag.parentNode.parentNode.tagName.toLowerCase() === 'a') {
@@ -74,6 +102,7 @@ export default class CardSwipe {
         this.isDragging = true;
         this.lockedAxis = null;
         this.action = null;
+        this.clearFeedback();
 
         if (e.type === 'mousedown') {
             this.startX = e.clientX;
@@ -97,40 +126,55 @@ export default class CardSwipe {
 
     drag(e) {
         if (!this.isDragging) return;
+        if (e.cancelable) e.preventDefault();
 
-        if (e.cancelable) {
-            e.preventDefault();
-        }
-
-        let x = 0;
-        let y = 0;
-
+        let x = 0, y = 0;
         if (e.type === 'mousemove') {
             x = e.clientX;
             y = e.clientY;
-        } else if (e.type === 'touchmove') {
+        } else {
             x = e.touches[0].clientX;
             y = e.touches[0].clientY;
         }
 
         const dx = x - this.startX;
         const dy = y - this.startY;
+        this.lastDx = dx;
+        this.lastDy = dy;
 
         const absDx = Math.abs(dx);
         const absDy = Math.abs(dy);
 
+        if (absDx <= this.EPS && absDy <= this.EPS) {
+            this.clearFeedback();
+        }
+
         if (!this.lockedAxis) {
+            if (absDx > this.EPS || absDy > this.EPS) {
+                if (absDx >= absDy) {
+                    if (dx >= 0) {
+                        this.setActiveFeedback('right');
+                    } else if (this.from !== 'playlist' && !this.playOnly) {
+                        this.setActiveFeedback('left');
+                    } else {
+                        this.clearFeedback();
+                    }
+                } else {
+                    if (dy < 0 && !this.playOnly) {
+                        this.setActiveFeedback('top');
+                    } else if (dy >= 0) {
+                        this.clearFeedback();
+                    }
+                }
+            }
+
+            // décision de lock d'axe
             if (absDx > this.lockThreshold || absDy > this.lockThreshold) {
                 if (absDx >= absDy) {
-                    // axe horizontal
                     this.lockedAxis = 'x';
                 } else {
-                    // axe vertical (haut uniquement)
-                    if (dy < 0) {
-                        this.lockedAxis = 'y';
-                    } else {
-                        return;
-                    }
+                    if (dy < 0) this.lockedAxis = 'y';
+                    else return; // vers le bas non supporté
                 }
             } else {
                 return;
@@ -138,15 +182,20 @@ export default class CardSwipe {
         }
 
         this.container.style.overflow = 'hidden';
-
         this.card.classList.remove('swipe-right', 'swipe-left', 'swipe-up');
         this.action = null;
 
-        // --------- AXE HORIZONTAL (gauche / droite) ----------
+        // ---- Horizontal
         if (this.lockedAxis === 'x') {
             const thresholdPx = this.threshold * this.container.offsetWidth;
-
             this.card.style.transform = `translate3d(${dx}px,0,0) rotate(${dx / 60}deg)`;
+
+            if (dx >= 0) {
+                this.setActiveFeedback('right');
+            } else {
+                if (this.from !== 'playlist' && !this.playOnly) this.setActiveFeedback('left');
+                else this.clearFeedback();
+            }
 
             if (dx > thresholdPx) {
                 this.action = 'play';
@@ -157,25 +206,25 @@ export default class CardSwipe {
                     this.card.classList.add('swipe-left');
                 }
             }
-
             return;
         }
 
-        // --------- AXE VERTICAL (HAUT UNIQUEMENT) ----------
+        // ---- Vertical (haut uniquement)
         if (this.lockedAxis === 'y') {
             const thresholdPx = this.threshold * this.container.offsetHeight;
-
             const effectiveDy = Math.min(dy, 0);
 
-            if (effectiveDy === 0) {
+            if (Math.abs(effectiveDy) <= this.EPS) {
                 this.card.style.transform = '';
                 this.action = null;
                 return;
             }
 
+            if (!this.playOnly) this.setActiveFeedback('top');
+
             this.card.style.transform = `translate3d(0,${effectiveDy}px,0)`;
 
-            if (!this.playOnly && effectiveDy < -thresholdPx) {
+            if (!this.playOnly && Math.abs(effectiveDy) > thresholdPx) {
                 this.action = 'view';
                 this.card.classList.add('swipe-up');
             }
@@ -197,25 +246,16 @@ export default class CardSwipe {
         if (hasSwipe) {
             switch (this.action) {
                 case 'cancel':
-                    if (this.from === 'flow') {
-                        this.cancel(e);
-                    } else if (this.from === 'vault') {
-                        this.goback(e);
-                    }
+                    if (this.from === 'flow') this.cancel(e);
+                    else if (this.from === 'vault') this.goback(e);
                     break;
                 case 'view':
-                    if (this.from === 'flow') {
-                        this.view(e);
-                    } else if (this.from === 'vault') {
-                        this.delete(e);
-                    }
+                    if (this.from === 'flow') this.view(e);
+                    else if (this.from === 'vault') this.delete(e);
                     break;
                 case 'play':
-                    if (this.from === 'flow') {
-                        this.play(e);
-                    } else if (this.from === 'vault') {
-                        this.edit(e);
-                    }
+                    if (this.from === 'flow') this.play(e);
+                    else if (this.from === 'vault') this.edit(e);
                     break;
                 default:
                     this.resetCard();
@@ -240,6 +280,7 @@ export default class CardSwipe {
             this.card.style.transition = '';
         }, 250);
         this.container.style.overflow = 'visible';
+        this.clearFeedback();
     }
 
     removeResetClass() {
@@ -247,6 +288,7 @@ export default class CardSwipe {
         this.container.style.overflow = 'visible';
     }
 
+    // --- Actions
     cancel(e) {
         this.card.classList.add('swipe-left');
         alert('Refus de la suggestion');
@@ -254,48 +296,43 @@ export default class CardSwipe {
             this.card.style.transition = '';
             this.card.style.transform = '';
             this.card.classList.remove('swipe-left');
+            this.clearFeedback();
         }, 100);
     }
 
     view(e) {
         this.card.classList.add('swipe-up');
-
         setTimeout(() => {
             this.card.style.transition = 'transform 0.3s';
             this.card.style.transform = 'translateY(0)';
-
             setTimeout(() => {
                 this.card.style.transition = '';
                 this.card.style.transform = '';
                 this.card.classList.remove('swipe-up');
+                this.clearFeedback();
             }, 500);
         }, 500);
-
         window.location.href = '/vault/disque/details';
     }
 
     play(e) {
         this.card.classList.add('swipe-right');
         if (this.from === 'playlist') {
-            //window.location.href = '/vinylehub/playlist/ajax/ecouter/' + this.card.dataset.id;
             alert('Lecture dans une playlist');
         } else {
-            //window.location.href = '/vinylematch/suggest/ajax/decision/' + this.card.dataset.id + '/1';
             alert('Lecture de la suggestion');
         }
         setTimeout(() => {
             this.card.style.transition = '';
             this.card.style.transform = '';
             this.card.classList.remove('swipe-right');
+            this.clearFeedback();
         }, 100);
     }
 
     goback(e) {
         this.instantResetForNav();
-
         const ref = document.referrer || '';
-        console.log(ref);
-
         if (ref.includes('/vault')) {
             window.location.href = '/vault';
         } else if (ref.includes('/flow')) {
@@ -312,6 +349,7 @@ export default class CardSwipe {
             this.card.style.transition = '';
             this.card.style.transform = '';
             this.card.classList.remove('swipe-up');
+            this.clearFeedback();
         }, 100);
     }
 
@@ -322,6 +360,7 @@ export default class CardSwipe {
             this.card.style.transition = '';
             this.card.style.transform = '';
             this.card.classList.remove('swipe-right');
+            this.clearFeedback();
         }, 100);
     }
 }
