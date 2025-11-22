@@ -1,12 +1,15 @@
 .app-feedback {
     color: $flow-primary;
+    border-color: $flow-primary;
     background-color: rgba($flow-third, 0.85);
 
     &.top {
         color: $info;
+        border-color: $info;
     }
 
     &.right {
         color: $success;
+        border-color: $success;
     }
 }

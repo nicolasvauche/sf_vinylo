@@ -8,7 +8,8 @@
     font-size: 0.75rem;
     font-weight: bold;
     text-transform: uppercase;
-    border-radius: 0.5rem;
+    border: 2px solid transparent;
+    border-radius: 1.5rem;
     box-shadow: 1px 1px 2px rgba($black, 0.85);
     will-change: opacity, transform;
     transition: opacity 0.15s ease-out, visibility 0s linear 0.15s;
@@ -27,11 +28,11 @@
         top: calc(13dvh + #{$safe-top});
         left: 50%;
         transform: translateX(-50%);
-        @include displayFlex(center, center, 0.25rem, column);
+        @include displayFlex(null, center, 0.25rem);
     }
 
     &.left {
-        left: calc(1rem + #{$safe-left});
+        left: calc(1.5rem + #{$safe-left});
         top: 50%;
         transform: translateY(-50%);
         @include displayFlex(null, center, 0.25rem);
@@ -42,7 +43,7 @@
     }
 
     &.right {
-        right: calc(1rem + #{$safe-right});
+        right: calc(1.5rem + #{$safe-right});
         top: 50%;
         transform: translateY(-50%);
         @include displayFlex(flex-end, center, 0.25rem, row-reverse);
