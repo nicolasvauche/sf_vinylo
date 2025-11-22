@@ -31,6 +31,7 @@ export default class CardSwipe {
         this.EPS = 2;
         this.lastDx = 0;
         this.lastDy = 0;
+        this.downTarget = null;
 
         this.initEventListeners();
     }
@@ -50,7 +51,7 @@ export default class CardSwipe {
 
     initEventListeners() {
         this.card.addEventListener('mousedown', this.startDrag.bind(this));
-        this.card.addEventListener('touchstart', this.startDrag.bind(this), {passive: false});
+        this.card.addEventListener('touchstart', this.startDrag.bind(this), {passive: true});
         this.card.addEventListener('transitionend', this.removeResetClass.bind(this));
 
         window.addEventListener('pageshow', (e) => {
@@ -84,21 +85,7 @@ export default class CardSwipe {
     }
 
     startDrag(e) {
-        if (e.cancelable) e.preventDefault();
-
-        const currentTag = e.target;
-        if (currentTag.tagName.toLowerCase() === 'i') {
-            if (currentTag.parentNode.tagName.toLowerCase() === 'span') {
-                if (currentTag.parentNode.parentNode.tagName.toLowerCase() === 'a') {
-                    currentTag.parentNode.parentNode.click();
-                    return;
-                }
-            }
-        } else if (currentTag.tagName.toLowerCase() === 'a') {
-            currentTag.click();
-            return;
-        }
-
+        this.downTarget = e.target;
         this.isDragging = true;
         this.lockedAxis = null;
         this.action = null;
@@ -107,7 +94,7 @@ export default class CardSwipe {
         if (e.type === 'mousedown') {
             this.startX = e.clientX;
             this.startY = e.clientY;
-        } else if (e.type === 'touchstart') {
+        } else {
             this.startX = e.touches[0].clientX;
             this.startY = e.touches[0].clientY;
         }
@@ -120,13 +107,14 @@ export default class CardSwipe {
 
         document.addEventListener('mousemove', this.dragBound);
         document.addEventListener('touchmove', this.dragBound, {passive: false});
-        document.addEventListener('mouseup', this.stopDragBound, {passive: false});
-        document.addEventListener('touchend', this.stopDragBound, {passive: false});
+        document.addEventListener('mouseup', this.stopDragBound);
+        document.addEventListener('touchend', this.stopDragBound);
     }
 
     drag(e) {
         if (!this.isDragging) return;
-        if (e.cancelable) e.preventDefault();
+
+        if (this.lockedAxis && e.cancelable) e.preventDefault();
 
         let x = 0, y = 0;
         if (e.type === 'mousemove') {
@@ -150,33 +138,25 @@ export default class CardSwipe {
         }
 
         if (!this.lockedAxis) {
-            if (absDx > this.EPS || absDy > this.EPS) {
-                if (absDx >= absDy) {
-                    if (dx >= 0) {
-                        this.setActiveFeedback('right');
-                    } else if (this.from !== 'playlist' && !this.playOnly) {
-                        this.setActiveFeedback('left');
-                    } else {
-                        this.clearFeedback();
-                    }
-                } else {
-                    if (dy < 0 && !this.playOnly) {
-                        this.setActiveFeedback('top');
-                    } else if (dy >= 0) {
-                        this.clearFeedback();
-                    }
-                }
-            }
-
-            // décision de lock d'axe
             if (absDx > this.lockThreshold || absDy > this.lockThreshold) {
                 if (absDx >= absDy) {
                     this.lockedAxis = 'x';
                 } else {
                     if (dy < 0) this.lockedAxis = 'y';
-                    else return; // vers le bas non supporté
+                    else return;
                 }
             } else {
+                if (absDx > this.EPS || absDy > this.EPS) {
+                    if (absDx >= absDy) {
+                        if (dx >= 0) this.setActiveFeedback('right');
+                        else if (!this.playOnly && this.from !== 'playlist') this.setActiveFeedback('left');
+                        else this.clearFeedback();
+                    } else if (dy < 0 && !this.playOnly) {
+                        this.setActiveFeedback('top');
+                    } else {
+                        this.clearFeedback();
+                    }
+                }
                 return;
             }
         }
@@ -185,7 +165,6 @@ export default class CardSwipe {
         this.card.classList.remove('swipe-right', 'swipe-left', 'swipe-up');
         this.action = null;
 
-        // ---- Horizontal
         if (this.lockedAxis === 'x') {
             const thresholdPx = this.threshold * this.container.offsetWidth;
             this.card.style.transform = `translate3d(${dx}px,0,0) rotate(${dx / 60}deg)`;
@@ -209,7 +188,6 @@ export default class CardSwipe {
             return;
         }
 
-        // ---- Vertical (haut uniquement)
         if (this.lockedAxis === 'y') {
             const thresholdPx = this.threshold * this.container.offsetHeight;
             const effectiveDy = Math.min(dy, 0);
@@ -221,7 +199,6 @@ export default class CardSwipe {
             }
 
             if (!this.playOnly) this.setActiveFeedback('top');
-
             this.card.style.transform = `translate3d(0,${effectiveDy}px,0)`;
 
             if (!this.playOnly && Math.abs(effectiveDy) > thresholdPx) {
@@ -231,8 +208,12 @@ export default class CardSwipe {
         }
     }
 
-    stopDrag(e) {
+    stopDrag() {
         if (!this.isDragging) return;
+
+        const absDx = Math.abs(this.lastDx);
+        const absDy = Math.abs(this.lastDy);
+        const wasLocked = !!this.lockedAxis;
 
         this.isDragging = false;
         this.card.classList.remove('dragging');
@@ -243,19 +224,28 @@ export default class CardSwipe {
             this.card.classList.contains('swipe-left') ||
             this.card.classList.contains('swipe-up');
 
+        if (!wasLocked && absDx <= this.EPS && absDy <= this.EPS) {
+            document.removeEventListener('mousemove', this.dragBound);
+            document.removeEventListener('touchmove', this.dragBound);
+            document.removeEventListener('mouseup', this.stopDragBound);
+            document.removeEventListener('touchend', this.stopDragBound);
+            this.card.style.willChange = '';
+            return;
+        }
+
         if (hasSwipe) {
             switch (this.action) {
                 case 'cancel':
-                    if (this.from === 'flow') this.cancel(e);
-                    else if (this.from === 'vault') this.goback(e);
+                    if (this.from === 'flow') this.cancel();
+                    else if (this.from === 'vault') this.goback();
                     break;
                 case 'view':
-                    if (this.from === 'flow') this.view(e);
-                    else if (this.from === 'vault') this.delete(e);
+                    if (this.from === 'flow') this.view();
+                    else if (this.from === 'vault') this.delete();
                     break;
                 case 'play':
-                    if (this.from === 'flow') this.play(e);
-                    else if (this.from === 'vault') this.edit(e);
+                    if (this.from === 'flow') this.play();
+                    else if (this.from === 'vault') this.edit();
                     break;
                 default:
                     this.resetCard();
@@ -289,7 +279,7 @@ export default class CardSwipe {
     }
 
     // --- Actions
-    cancel(e) {
+    cancel() {
         this.card.classList.add('swipe-left');
         alert('Refus de la suggestion');
         setTimeout(() => {
@@ -300,7 +290,7 @@ export default class CardSwipe {
         }, 100);
     }
 
-    view(e) {
+    view() {
         this.card.classList.add('swipe-up');
         setTimeout(() => {
             this.card.style.transition = 'transform 0.3s';
@@ -315,7 +305,7 @@ export default class CardSwipe {
         window.location.href = '/vault/disque/details';
     }
 
-    play(e) {
+    play() {
         this.card.classList.add('swipe-right');
         if (this.from === 'playlist') {
             alert('Lecture dans une playlist');
@@ -330,7 +320,7 @@ export default class CardSwipe {
         }, 100);
     }
 
-    goback(e) {
+    goback() {
         this.instantResetForNav();
         const ref = document.referrer || '';
         if (ref.includes('/vault')) {
@@ -342,7 +332,7 @@ export default class CardSwipe {
         }
     }
 
-    delete(e) {
+    delete() {
         this.card.classList.add('swipe-up');
         alert('Supprimer le disque');
         setTimeout(() => {
@@ -353,7 +343,7 @@ export default class CardSwipe {
         }, 100);
     }
 
-    edit(e) {
+    edit() {
         this.card.classList.add('swipe-right');
         alert('Modifier le disque');
         setTimeout(() => {
