@@ -1,4 +1,4 @@
-export default class CardSwipe {
+export default class DiskSwipe {
     constructor(containerSelector, cardElement, feedbackElements, threshold, from, playOnly) {
         this.container = document.querySelector(containerSelector);
         this.card = cardElement;

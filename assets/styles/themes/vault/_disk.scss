@@ -1,24 +1,22 @@
-.app-section {
-    &.disk {
-        &.no-animate {
-            transition: none !important;
-        }
+.app-disk {
+    &.no-animate {
+        transition: none !important;
+    }
 
-        .infos {
-            .notes {
-                ul {
-                    li {
-                        .app-icon {
-                            color: $vault-fourth;
-                        }
+    .infos {
+        .notes {
+            ul {
+                li {
+                    .app-icon {
+                        color: $vault-fourth;
                     }
                 }
             }
+        }
 
-            .playlist {
-                color: $white;
-                background-color: $vault-secondary;
-            }
+        .playlist {
+            color: $white;
+            background-color: $vault-secondary;
         }
     }
 }

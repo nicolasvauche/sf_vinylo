@@ -3,8 +3,8 @@
 {% block title %}Flow{% endblock %}
 
 {% block main %}
-    <main class="app-main app-cards" data-controller="card--swipe">
-        <section class="app-section disk app-card" data-id="1" data-from="flow">
+    <main class="app-main app-disks" data-controller="disk--swipe">
+        <section class="app-section app-disk" data-id="1" data-from="flow">
             <img src="{{ asset('img/cover.jpg') }}" alt="Disque suggéré"/>
 
             <span class="app-feedback top">
@@ -13,11 +13,11 @@
             </span>
             <span class="app-feedback left">
                 {{ ux_icon('bxs:up-arrow', {'class': 'app-icon'}) }}
-                On passe
+                Passer
             </span>
             <span class="app-feedback right">
                 {{ ux_icon('bxs:up-arrow', {'class': 'app-icon'}) }}
-                On écoute
+                Écouter
             </span>
 
             <div class="infos">

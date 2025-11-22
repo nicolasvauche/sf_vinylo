@@ -1,12 +1,12 @@
 import {Controller} from '@hotwired/stimulus';
-import CardSwipe from '../../modules/CardSwipe.js';
+import DiskSwipe from '../../modules/DiskSwipe.js';
 
 export default class extends Controller {
     connect() {
-        const card = document.querySelector('.app-card');
+        const card = document.querySelector('.app-disk');
         if (card) {
-            const cardSwipe = new CardSwipe(
-                '.app-cards',
+            const cardSwipe = new DiskSwipe(
+                '.app-disks',
                 card,
                 ['top', 'left', 'right'],
                 0.3,
