@@ -4,7 +4,12 @@
 
 {% block main %}
     <main class="app-main app-disks" data-controller="disk--swipe">
-        <section class="app-section app-disk" data-id="1" data-from="vault" data-confirm-url="{{ path('modal_confirm', { title: 'ce disque' }) }}">
+        <section
+            class="app-section app-disk"
+            data-id="1"
+            data-from="vault"
+            data-confirm-url="{{ path('modal_confirm', { title: 'ce disque' }) }}"
+            data-action-url="{{ path('app_disk_delete') }}">
             <img src="{{ asset('img/cover.jpg') }}" alt="Disque"/>
 
             <span class="app-feedback top">

@@ -9,6 +9,7 @@ export default class extends Controller {
         size: String,
         variant: String,
         footerHtml: String,
+        actionUrl: String,
     };
 
     open() {
@@ -24,6 +25,7 @@ export default class extends Controller {
                 size: this.sizeValue,
                 variant: this.variantValue,
                 footerHtml: this.footerHtmlValue || null,
+                actionUrl: this.actionUrlValue || null
             }
         }));
     }

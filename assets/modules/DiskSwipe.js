@@ -354,6 +354,7 @@ export default class DiskSwipe {
     delete() {
         const modalEl = document.getElementById('app-modal');
         const url = this.card.dataset.confirmUrl;
+        const actionUrl = this.card.dataset.actionUrl;
 
         this.hardReset();
 
@@ -368,7 +369,8 @@ export default class DiskSwipe {
                     footerHtml: `
                     <button type="button" data-action="modal--modal#close">Annuler</button>
                     <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Supprimer</button>
-                `
+                `,
+                    actionUrl: actionUrl
                 }
             }));
         });

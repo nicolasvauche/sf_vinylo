@@ -1,0 +1,16 @@
+.app-tabs {
+    @include displayFlex(center, null, null, column);
+    flex: 1;
+
+    .app-footer-tabs {
+        .tabs-list {
+            .tabs-button {
+                &[aria-selected="true"],
+                &.is-active {
+                    color: $secondary;
+                    background-color: $white;
+                }
+            }
+        }
+    }
+}

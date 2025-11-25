@@ -3,11 +3,22 @@
         margin-top: 0.5rem;
 
         .app-links {
+            @include displayFlex(center, center);
+
+            &:has(> :nth-child(2)) {
+                @include displayGrid(7fr 3fr, 1rem);
+                align-items: center;
+            }
+
             & > a,
             & > button {
-                color: $danger;
+                color: $primary;
                 background-color: $white;
                 box-shadow: none;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
             }
         }
     }

@@ -1,0 +1,16 @@
+.app-modal {
+    .head {
+        .title {
+            color: $primary;
+        }
+    }
+
+    .foot {
+        & > div {
+            & > button {
+                color: $secondary;
+                background-color: $fourth;
+            }
+        }
+    }
+}

@@ -26,6 +26,12 @@ final class DefaultController extends AbstractController
         return $this->render('default/disk_details.html.twig');
     }
 
+    #[Route('/vault/disque/supprimer', name: 'app_disk_delete')]
+    public function diskDelete(): Response
+    {
+        return $this->redirectToRoute('app_vault');
+    }
+
     #[Route('/flow', name: 'app_flow')]
     public function flow(): Response
     {
@@ -36,5 +42,29 @@ final class DefaultController extends AbstractController
     public function profile(): Response
     {
         return $this->render('default/profile.html.twig');
+    }
+
+    #[Route('/profil/supprimer', name: 'account_delete')]
+    public function accountDelete(): Response
+    {
+        return $this->redirectToRoute('app_profile');
+    }
+
+    #[Route('/nouvel-utilisateur', name: 'app_register')]
+    public function register(): Response
+    {
+        return $this->render('default/register.html.twig');
+    }
+
+    #[Route('/connexion', name: 'app_login')]
+    public function login(): Response
+    {
+        return $this->render('default/login.html.twig');
+    }
+
+    #[Route('/deconnexion', name: 'app_logout')]
+    public function logout(): Response
+    {
+        return $this->redirectToRoute('app_login');
     }
 }

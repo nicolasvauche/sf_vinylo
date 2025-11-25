@@ -1,0 +1,34 @@
+.app-tabs {
+    .app-main {
+        .tabs-panel {
+            &[hidden] {
+                display: none !important;
+            }
+        }
+    }
+
+    .app-footer-tabs {
+        .tabs-list {
+            @include displayFlex(center, center);
+            background-color: $white;
+
+            .tabs-button {
+                @include displayFlex(center, center, 0.25rem, column);
+                flex: 1;
+                padding: 0.5rem 0.5rem 1rem;
+                font-size: 0.6rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: $primary;
+                background-color: transparent;
+                border: 0;
+                cursor: pointer;
+                transition: all 0.3s;
+
+                .app-icon {
+                    font-size: 2.5rem;
+                }
+            }
+        }
+    }
+}

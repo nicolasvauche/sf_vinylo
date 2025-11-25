@@ -28,4 +28,10 @@ class ModalController extends AbstractController
     {
         return $this->render('modal/_playlists.html.twig', ['initial' => $request->get('initial') ?? '']);
     }
+
+    #[Route('/modal/logout', name: 'modal_logout')]
+    public function logout(): Response
+    {
+        return $this->render('modal/_logout.html.twig');
+    }
 }

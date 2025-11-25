@@ -9,6 +9,14 @@
     .form-fieldset {
         margin-bottom: 2rem;
 
+        &:has(+ .controls) {
+            margin-bottom: 0;
+        }
+
+        &.controls {
+            margin: 3rem 0 0;
+        }
+
         .form-legend {
             margin-bottom: 1.5rem;
             font-size: 1rem;
@@ -28,11 +36,6 @@
 
         &:last-child {
             margin-bottom: 0;
-        }
-
-        &:has(>ul),
-        &:has(.help) {
-            margin-bottom: 2.5rem;
         }
 
         .form-label {

@@ -6,6 +6,7 @@ export default class extends Controller {
         variant: String,
         title: String,
         description: String,
+        actionUrl: String,
     };
 
     static targets = ["footer"];
@@ -20,7 +21,6 @@ export default class extends Controller {
             this.sentinel = document.createElement('div');
             this.sentinel.id = 'modal-focus-sentinel';
             this.sentinel.tabIndex = -1;
-            // invisible mais focusable, hors flux
             Object.assign(this.sentinel.style, {
                 position: 'fixed',
                 width: '1px',
@@ -52,9 +52,10 @@ export default class extends Controller {
         document.removeEventListener("keydown", this.boundKeydown);
     }
 
-    open({title, description, bodyUrl, footerHtml, size, variant} = {}) {
+    open({title, description, bodyUrl, footerHtml, size, variant, actionUrl} = {}) {
         this.prevActive = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
+        if (actionUrl) this.actionUrlValue = actionUrl;
         if (size) this.element.classList.toggle("s", size === "s");
         if (variant) this.element.classList.toggle("picker", variant === "picker");
 
@@ -125,9 +126,14 @@ export default class extends Controller {
         }
     }
 
-    confirm(e) {
-        const payload = e?.detail || {};
-        this.dispatch("confirm", {detail: payload});
+    async confirm(e) {
+        const url = this.actionUrlValue;
+
         this.close("confirm");
+
+        if (url) {
+            window.location.href = url;
+        }
     }
+
 }
