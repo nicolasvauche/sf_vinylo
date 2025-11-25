@@ -29,6 +29,8 @@ final class DefaultController extends AbstractController
     #[Route('/vault/disque/supprimer', name: 'app_disk_delete')]
     public function diskDelete(): Response
     {
+        $this->addFlash('danger', 'Le disque a été supprimé');
+
         return $this->redirectToRoute('app_vault');
     }
 
@@ -47,7 +49,9 @@ final class DefaultController extends AbstractController
     #[Route('/profil/supprimer', name: 'account_delete')]
     public function accountDelete(): Response
     {
-        return $this->redirectToRoute('app_profile');
+        $this->addFlash('danger', 'Votre compte a été supprimé');
+
+        return $this->redirectToRoute('app_register');
     }
 
     #[Route('/nouvel-utilisateur', name: 'app_register')]

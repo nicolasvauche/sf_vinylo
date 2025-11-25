@@ -9,6 +9,11 @@
     background-color: $success !important;
 }
 
+.bg-warning {
+    color: $white !important;
+    background-color: $warning !important;
+}
+
 .bg-danger {
     color: $white !important;
     background-color: $danger !important;
@@ -21,6 +26,10 @@
 
 .text-success {
     color: $success !important;
+}
+
+.text-warning {
+    color: $warning !important;
 }
 
 .text-danger {

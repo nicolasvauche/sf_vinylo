@@ -1,0 +1,35 @@
+{% set typeClass = {
+    'success': 'bg-success',
+    'info':    'bg-info',
+    'warning': 'bg-warning',
+    'error':   'bg-danger',
+    'danger':  'bg-danger',
+    'primary': 'bg-info'
+} %}
+
+{% set flashes_html %}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="app-flash {{ typeClass[type] | default('bg-info') }}"
+                 role="{{ type in ['error','danger','warning'] ? 'alert' : 'status' }}"
+                 style="--flash-duration: 5s;">
+                <div class="flash-body">
+                    <p class="flash-message">{{ message|raw }}</p>
+                </div>
+                <button class="flash-close" type="button" aria-label="Fermer">×</button>
+                <div class="flash-timer" aria-hidden="true"></div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endset %}
+
+{% if flashes_html|trim is not empty %}
+    <div class="app-flashes"
+         data-controller="alert--alert"
+         data-alert--alert-duration-value="5000"
+         data-alert--alert-max-value="5"
+         aria-live="polite"
+         aria-atomic="true">
+        {{ flashes_html | raw }}
+    </div>
+{% endif %}

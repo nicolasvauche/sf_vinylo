@@ -1,0 +1,81 @@
+.app-flashes {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    padding: 0.5rem 1rem;
+    @include displayFlex(flex-start, center, null, column);
+    pointer-events: none;
+}
+
+.app-flash {
+    pointer-events: auto;
+    overflow: hidden;
+    @include displayFlex(space-between, center);
+    flex-wrap: wrap;
+    margin: 0.5rem auto;
+    width: 100%;
+    color: $primary;
+    background-color: $white;
+    border-radius: .9rem;
+    box-shadow: 0 10px 30px rgba($black, .5);
+
+    &.s {
+        width: min(96vw, 420px);
+    }
+
+    .flash-body {
+        padding: .75rem 1rem;
+    }
+
+    .flash-close {
+        padding: .5rem .75rem;
+        font-size: 1.5rem;
+        color: $white;
+        background: none;
+        border: 0;
+        cursor: pointer;
+    }
+
+    .flash-timer {
+        width: 100%;
+        height: 3px;
+        background: rgba($black, .08);
+
+        &::after {
+            content: '';
+            display: block;
+            height: 100%;
+            background: currentColor;
+            width: 100%;
+            transform-origin: left;
+            animation: flashTimer linear forwards;
+            animation-duration: var(--flash-duration, 4s);
+        }
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .app-flash {
+        animation: flashIn .28s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    @keyframes flashIn {
+        from {
+            transform: translateY(-6px);
+            opacity: .6;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes flashTimer {
+        from {
+            transform: scaleX(1);
+        }
+        to {
+            transform: scaleX(0);
+        }
+    }
+}
