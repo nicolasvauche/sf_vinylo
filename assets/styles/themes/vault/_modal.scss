@@ -9,12 +9,12 @@
         ul {
             li {
                 & > button {
-                    color: $vault-secondary;
-                    background-color: $white;
+                    color: $white;
+                    background-color: $vault-secondary;
 
                     &.active {
                         color: $white;
-                        background-color: $vault-secondary;
+                        background-color: $vault-fourth;
                     }
                 }
             }
@@ -24,8 +24,8 @@
     .foot {
         & > div {
             & > button {
-                color: $vault-secondary;
-                background-color: $vault-third;
+                color: $white;
+                background-color: $vault-secondary;
 
                 &.active {
                     color: $white;

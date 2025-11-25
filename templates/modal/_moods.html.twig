@@ -1,18 +1,21 @@
 {% set moods = moods ?? [
-    {id:'calme', label:'Calme', icon: 'fa7-solid:peace'},
-    {id:'concentration', label:'Concentration', icon: 'fa7-solid:bullseye'},
-    {id:'doux', label:'Doux', icon: 'fa7-solid:heart'},
-    {id:'energie', label:'Énergie', icon: 'fa7-solid:fist-raised'},
-    {id:'festif', label:'Festif', icon: 'fa7-solid:glass-cheers'},
-    {id:'melancolique', label:'Mélancolique', icon: 'fa7-solid:face-frown'},
-    {id:'nostalgique', label:'Nostalgique', icon: 'file-icons:bazel-old'},
-    {id:'decouverte', label:'Découverte', icon: 'weui:discover-filled'}
+    {id:'calme', label:'Calme', icon: 'fa7-solid:peace', active: false},
+    {id:'concentration', label:'Concentration', icon: 'fa7-solid:bullseye', active: false},
+    {id:'doux', label:'Doux', icon: 'fa7-solid:heart', active: true},
+    {id:'energie', label:'Énergie', icon: 'fa7-solid:fist-raised', active: false},
+    {id:'festif', label:'Festif', icon: 'fa7-solid:glass-cheers', active: false},
+    {id:'melancolique', label:'Mélancolique', icon: 'fa7-solid:face-frown', active: false},
+    {id:'nostalgique', label:'Nostalgique', icon: 'file-icons:bazel-old', active: false},
+    {id:'decouverte', label:'Découverte', icon: 'weui:discover-filled', active: false}
 ] %}
+{% set initial = (initial is defined and initial is not same as(''))
+    ? initial
+    : (moods|filter(m => m.active)|first).id ?? '' %}
 
 <turbo-frame id="app-modal-frame">
     <ul class="picker-list"
         data-controller="modal--mood-picker"
-        data-initial="{{ initial|default('') }}">
+        data-initial="{{ initial | default('') }}">
         {% for m in moods %}
             <li>
                 <button
