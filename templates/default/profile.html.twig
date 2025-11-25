@@ -28,7 +28,23 @@
 
     <section class="app-section headline">
         <div class="app-links">
-            <a href="#">Supprimer votre compte</a>
+            <button
+                type="button"
+                class="link-like"
+                data-controller="modal--modal-opener"
+                data-modal--modal-opener-modal-value="#app-modal"
+                data-modal--modal-opener-variant-value="confirm"
+                data-modal--modal-opener-size-value="s"
+                data-modal--modal-opener-title-value="Supprimer votre compte ?"
+                data-modal--modal-opener-body-url-value="{{ path('modal_confirm', { title: 'votre compte' }) }}"
+                data-modal--modal-opener-footer-html-value='
+        <button type="button" data-action="modal--modal#close">Annuler</button>
+        <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Supprimer</button>
+      '
+                data-action="click->modal--modal-opener#open"
+            >
+                Supprimer votre compte
+            </button>
         </div>
     </section>
 
@@ -72,8 +88,8 @@
                 <div class="form-group">
                     <label for="add" class="form-label">Ajouter</label>
                     <div class="app-grid">
-                        <input type="text" name="add" id="add" class="form-control" placeholder="Nom" required/>
-                        <input type="text" name="add-city" id="add-city" class="form-control" placeholder="Ville" required/>
+                        <input type="text" name="add" id="add" class="form-control" placeholder="Nom"/>
+                        <input type="text" name="add-city" id="add-city" class="form-control" placeholder="Ville"/>
                     </div>
                 </div>
             </fieldset>

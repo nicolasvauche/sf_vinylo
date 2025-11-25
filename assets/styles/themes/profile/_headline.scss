@@ -3,7 +3,8 @@
         margin-top: 0.5rem;
 
         .app-links {
-            & > a {
+            & > a,
+            & > button {
                 color: $danger;
                 background-color: $white;
                 box-shadow: none;
