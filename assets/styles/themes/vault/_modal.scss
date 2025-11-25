@@ -9,8 +9,8 @@
         ul {
             li {
                 & > button {
-                    color: $white;
-                    background-color: $vault-secondary;
+                    color: $vault-secondary;
+                    background-color: $white;
 
                     &.active {
                         color: $white;
