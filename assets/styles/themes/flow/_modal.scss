@@ -1,0 +1,37 @@
+.app-modal {
+    .head {
+        .title {
+            color: $flow-primary;
+        }
+    }
+
+    .body {
+        ul {
+            li {
+                & > button {
+                    color: $flow-secondary;
+                    background-color: $white;
+
+                    &.active {
+                        color: $white;
+                        background-color: $flow-secondary;
+                    }
+                }
+            }
+        }
+    }
+
+    .foot {
+        & > div {
+            & > button {
+                color: $flow-secondary;
+                background-color: $flow-third;
+
+                &.active {
+                    color: $white;
+                    background-color: $flow-fourth;
+                }
+            }
+        }
+    }
+}

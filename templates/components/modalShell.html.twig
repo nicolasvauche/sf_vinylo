@@ -1,0 +1,31 @@
+<div id="app-modal"
+     class="app-modal m confirm picker"
+     data-controller="modal--modal"
+     data-modal--modal-dismissible-value="true"
+     data-modal--modal-variant-value="confirm"
+     data-modal--modal-title-value=""
+     data-modal--modal-description-value=""
+     aria-hidden="true"
+>
+    <div class="backdrop" data-action="click->modal--modal#onBackdrop"></div>
+
+    <div class="dialog"
+         role="{{ variant == 'confirm' ? 'alertdialog' : 'dialog' }}"
+         aria-modal="true"
+         aria-labelledby="{{ id }}-title"
+         aria-describedby="{{ id }}-desc"
+         tabindex="-1">
+        <header class="head">
+            <h2 id="{{ id }}-title" class="title"></h2>
+            <button class="close" type="button" title="Fermer" data-action="modal--modal#close">×</button>
+        </header>
+
+        <div id="{{ id }}-desc" class="body">
+            <turbo-frame id="{{ id }}-frame"></turbo-frame>
+        </div>
+
+        <footer class="foot">
+            <div data-modal--modal-target="footer"></div>
+        </footer>
+    </div>
+</div>

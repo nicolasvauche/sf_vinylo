@@ -1,0 +1,28 @@
+{% set playlists = playlists ?? [
+    {id:'fav', name:'Favoris'},
+    {id:'matin', name:'Matin'},
+    {id:'metal', name:'Metal Only'}
+] %}
+
+<turbo-frame id="app-modal-frame">
+    <ul class="picker-grid"
+        data-controller="modal--playlist-picker"
+        data-initial="{{ initial|default('') }}">
+
+        {% for p in playlists %}
+            <li>
+                <button
+                    type="button"
+                    class="picker-card"
+                    data-id="{{ p.id }}"
+                    aria-pressed="false"
+                    data-action="click->modal--playlist-picker#toggle"
+                >
+                    {{ ux_icon('material-symbols:playlist-play', {'class': 'app-icon'}) }}
+                    <span>{{ p.name }}</span>
+                </button>
+            </li>
+        {% endfor %}
+
+    </ul>
+</turbo-frame>

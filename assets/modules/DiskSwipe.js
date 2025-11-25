@@ -278,6 +278,25 @@ export default class DiskSwipe {
         this.container.style.overflow = 'visible';
     }
 
+    hardReset() {
+        const card = this.card;
+
+        card.style.transition = 'none';
+        card.style.transform = '';
+        card.classList.remove(
+            'swipe-left',
+            'swipe-right',
+            'swipe-up',
+            'dragging',
+        );
+
+        this.clearFeedback();
+        this.container.style.overflow = 'visible';
+        card.style.willChange = '';
+        void card.offsetHeight;
+        setTimeout(() => card.style.transition = '', 0);
+    }
+
     // --- Actions
     cancel() {
         this.card.classList.add('swipe-left');
@@ -333,14 +352,26 @@ export default class DiskSwipe {
     }
 
     delete() {
-        this.card.classList.add('swipe-up');
-        alert('Supprimer le disque');
-        setTimeout(() => {
-            this.card.style.transition = '';
-            this.card.style.transform = '';
-            this.card.classList.remove('swipe-up');
-            this.clearFeedback();
-        }, 100);
+        const modalEl = document.getElementById('app-modal');
+        const url = this.card.dataset.confirmUrl;
+
+        this.hardReset();
+
+        requestAnimationFrame(() => {
+            modalEl.dispatchEvent(new CustomEvent('modal:open', {
+                bubbles: true,
+                detail: {
+                    title: 'Supprimer ce disque ?',
+                    variant: 'confirm',
+                    size: 's',
+                    bodyUrl: url,
+                    footerHtml: `
+                    <button type="button" data-action="modal--modal#close">Annuler</button>
+                    <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Supprimer</button>
+                `
+                }
+            }));
+        });
     }
 
     edit() {

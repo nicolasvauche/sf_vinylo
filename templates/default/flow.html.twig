@@ -28,9 +28,22 @@
                             <a href="#">Bob Marley & The Wailers</a>
                         </h3>
                     </div>
-                    <a href="#" class="playlist" title="Ajouter à une Playlist">
+                    <button
+                        type="button"
+                        class="playlist"
+                        data-controller="modal--modal-opener"
+                        data-modal--modal-opener-modal-value="#app-modal"
+                        data-modal--modal-opener-variant-value="picker"
+                        data-modal--modal-opener-title-value="Ajoutez à une playlist"
+                        data-modal--modal-opener-body-url-value="{{ path('modal_playlists', { initial: currentPlaylistId|default('') }) }}"
+                        data-modal--modal-opener-footer-html-value='
+    <button type="button" data-action="modal--modal#close">Annuler</button>
+    <button type="button" data-primary disabled data-action="modal--mood-picker#confirm" class="bg-success">Valider</button>
+  '
+                        data-action="click->modal--modal-opener#open"
+                    >
                         {{ ux_icon('material-symbols:playlist-add-rounded', {'class': 'app-icon'}) }}
-                    </a>
+                    </button>
                 </header>
 
                 <div class="notes">

@@ -26,5 +26,12 @@
 
     <body class="{% block bodyclass %}{% endblock %}">
         {% block body %}{% endblock %}
+
+        {{ component('ModalShell', {
+            id: 'app-modal',
+            variant: 'confirm',
+            size: 'm',
+            dismissible: true
+        }) }}
     </body>
 </html>

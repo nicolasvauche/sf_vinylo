@@ -1,0 +1,151 @@
+.app-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    display: none;
+
+    &.open {
+        display: block;
+    }
+
+    .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .5);
+        overscroll-behavior: contain;
+    }
+
+    .dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(96vw, 640px);
+        max-height: 80vh;
+        color: $primary;
+        background-color: $white;
+        border-radius: .9rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+        outline: none;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        overflow: hidden;
+        padding-bottom: max(.25rem, env(safe-area-inset-bottom));
+    }
+
+    &.s .dialog {
+        max-height: 70vh;
+        width: min(96vw, 420px);
+    }
+
+    .head, .foot {
+        padding: .75rem 1rem;
+    }
+
+    .head {
+        @include displayFlex(space-between, center, 1rem);
+    }
+
+    .foot {
+        & > div {
+            @include displayFlex(space-between, center, 1rem);
+
+            & > button {
+                @include displayFlex(center, center, 0.25rem);
+                flex: 1;
+                padding: 0.5rem 0.75rem;
+                font-family: $font-primary;
+                font-size: 0.75rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                background-color: transparent;
+                border: none;
+                border-radius: 0.5rem;
+                box-shadow: 1px 1px 2px rgba($black, 0.75);
+
+                &:active {
+                    box-shadow: inset 1px 1px 2px rgba($black, 0.75);
+                }
+            }
+        }
+    }
+
+    .body {
+        padding: .5rem 1rem 1rem;
+        overflow: auto;
+        overscroll-behavior: contain;
+        min-height: 2.5rem;
+
+        ul {
+            @include displayGrid(repeat(2, 1fr), 1rem);
+
+            li {
+                @include displayFlex;
+
+                & > button {
+                    @include displayFlex(center, center, 0.5rem, column);
+                    flex: 1;
+                    padding: 0.5rem;
+                    font-size: 0.75rem;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    background-color: $white;
+                    border: none;
+                    border-radius: 0.5rem;
+                    box-shadow: 1px 1px 2px rgba($black, 0.85);
+
+                    &:active,
+                    &.active {
+                        box-shadow: inset 1px 1px 2px rgba($black, 0.85);
+                    }
+
+                    .app-icon {
+                        font-size: 2rem;
+                    }
+                }
+            }
+        }
+    }
+
+    .title {
+        margin: 0;
+        font-size: 1.15rem;
+        text-transform: uppercase;
+    }
+
+    .close {
+        background: none;
+        border: 0;
+        font-size: 1.75rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        &.open .dialog {
+            animation: modalIn .3s cubic-bezier(.2, .8, .2, 1);
+        }
+        .backdrop {
+            animation: fadeIn .3s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: translate(-50%, -46%);
+                opacity: .6;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    }
+}
