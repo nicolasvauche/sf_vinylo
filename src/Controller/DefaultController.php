@@ -11,7 +11,7 @@ final class DefaultController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        return $this->render('default/index.html.twig');
+        return $this->redirectToRoute('app_flow');
     }
 
     #[Route('/vault', name: 'app_vault')]
@@ -52,17 +52,5 @@ final class DefaultController extends AbstractController
         $this->addFlash('danger', 'Votre compte a été supprimé');
 
         return $this->redirectToRoute('app_register');
-    }
-
-    #[Route('/connexion', name: 'app_login')]
-    public function login(): Response
-    {
-        return $this->render('default/login.html.twig');
-    }
-
-    #[Route('/deconnexion', name: 'app_logout')]
-    public function logout(): Response
-    {
-        return $this->redirectToRoute('app_login');
     }
 }

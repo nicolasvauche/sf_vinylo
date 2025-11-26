@@ -3,5 +3,16 @@
 {% block title %}Nouvel utilisateur{% endblock %}
 
 {% block main %}
-    {% include "user/register/_form.html.twig" %}
+    <section class="app-section headline">
+        <div class="app-links">
+            <a href="{{ path('app_login') }}" class="text-info">
+                <small>Déjà inscrit ?</small>
+                Connectez-vous
+            </a>
+        </div>
+    </section>
+
+    <main class="app-main">
+        {% include "user/register/_form.html.twig" %}
+    </main>
 {% endblock %}

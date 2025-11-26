@@ -1,0 +1,41 @@
+{% extends '_layout/user/_index.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block main %}
+    <section class="app-section headline">
+        <div class="app-links">
+            <a href="{{ path('app_register') }}" class="text-info">
+                <small>Pas encore de compte ?</small>
+                Inscrivez--vous
+            </a>
+        </div>
+    </section>
+
+    <main class="app-main">
+        <form method="post" class="app-form">
+            <fieldset class="form-fieldset">
+                <legend class="form-legend">Vos identifiants</legend>
+
+                <div class="form-group">
+                    <div class="group-widget">
+                        <label for="username" class="form-label required">Votre adresse e-mail</label>
+                        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="group-widget">
+                        <label for="password" class="form-label required">Password</label>
+                        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required/>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-fieldset controls">
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}"/>
+                <button type="submit" class="form-submit">Connexion</button>
+            </fieldset>
+        </form>
+    </main>
+{% endblock %}
