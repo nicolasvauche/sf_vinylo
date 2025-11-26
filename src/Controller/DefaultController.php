@@ -54,12 +54,6 @@ final class DefaultController extends AbstractController
         return $this->redirectToRoute('app_register');
     }
 
-    #[Route('/nouvel-utilisateur', name: 'app_register')]
-    public function register(): Response
-    {
-        return $this->render('default/register.html.twig');
-    }
-
     #[Route('/connexion', name: 'app_login')]
     public function login(): Response
     {

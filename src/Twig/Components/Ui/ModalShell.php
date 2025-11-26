@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Twig\Components;
+namespace App\Twig\Components\Ui;
 
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
-#[AsTwigComponent('ModalShell')]
+#[AsTwigComponent('ModalShell', template: '_components/modal_shell.html.twig')]
 final class ModalShell
 {
     public string $id = 'app-modal';

@@ -1,0 +1,15 @@
+.form-fieldset {
+    margin-bottom: 2rem;
+
+    &:has(+ .controls) {
+        margin-bottom: 0;
+    }
+
+    &.controls {
+        margin: 3rem 0 0;
+
+        @import "../../components/form/submit";
+    }
+
+    @import "../../components/form/legend";
+}
