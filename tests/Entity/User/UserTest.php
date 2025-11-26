@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Entity;
+namespace App\Tests\Entity\User;
 
 use App\Entity\User\User;
 use PHPUnit\Framework\Attributes\CoversClass;
