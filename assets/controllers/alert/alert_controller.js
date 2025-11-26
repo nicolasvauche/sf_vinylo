@@ -2,7 +2,7 @@ import {Controller} from '@hotwired/stimulus';
 
 export default class extends Controller {
     static values = {
-        duration: {type: Number, default: 5000},
+        duration: Number,
         max: {type: Number, default: 5}
     };
 
@@ -19,22 +19,22 @@ export default class extends Controller {
         }
     }
 
-    push({html = '', type = 'info', duration = this.durationValue, size = ''} = {}) {
+    push({html = '', type = 'info', duration, size = ''} = {}) {
         const el = document.createElement('div');
         el.className = `app-flash is-${type} ${size}`.trim();
         el.setAttribute('role', (type === 'error' || type === 'warning') ? 'alert' : 'status');
 
-        if (duration) {
-            el.style.setProperty('--flash-duration', `${Math.max(1000, Number(duration))}ms`);
+        if (Number.isFinite(duration)) {
+            el.style.setProperty('--flash-duration', `${Math.max(0, Number(duration))}ms`);
         }
 
         el.innerHTML = `
-      <div class="flash-body">
-        <p class="flash-message">${html}</p>
-      </div>
-      <button class="flash-close" type="button" aria-label="Fermer">×</button>
-      <div class="flash-timer" aria-hidden="true"></div>
-    `;
+            <div class="flash-body">
+                <p class="flash-message">${html}</p>
+            </div>
+            <button class="flash-close" type="button" aria-label="Fermer">×</button>
+            <div class="flash-timer" aria-hidden="true"></div>
+        `;
 
         this.element.appendChild(el);
         this._bindFlash(el);
@@ -47,26 +47,37 @@ export default class extends Controller {
 
     _bindFlash(flash) {
         const cssVar = getComputedStyle(flash).getPropertyValue('--flash-duration').trim();
-        const parsed = this._parseDuration(cssVar);
-        let duration = Number.isFinite(parsed) ? parsed : this.durationValue;
+        const parsedFromCss = this._parseDuration(cssVar);
+        const hasControllerDuration = Object.prototype.hasOwnProperty.call(this, 'hasDurationValue') && this.hasDurationValue;
+        const controllerDuration = hasControllerDuration ? Number(this.durationValue) : NaN;
 
-        let timeout = setTimeout(() => this._dismiss(flash), duration);
-
-        flash.addEventListener('mouseenter', () => {
-            if (timeout) {
-                clearTimeout(timeout);
-                timeout = null;
-            }
-        });
-        flash.addEventListener('mouseleave', () => {
-            if (!timeout) {
-                timeout = setTimeout(() => this._dismiss(flash), 1200);
-            }
-        });
+        const duration = Number.isFinite(parsedFromCss)
+            ? parsedFromCss
+            : (Number.isFinite(controllerDuration) ? controllerDuration : NaN);
 
         const closeBtn = flash.querySelector('.flash-close');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this._dismiss(flash));
+        }
+
+        if (Number.isFinite(duration) && duration > 0) {
+            let timeout = setTimeout(() => this._dismiss(flash), duration);
+
+            flash.addEventListener('mouseenter', () => {
+                if (timeout) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                }
+            });
+
+            flash.addEventListener('mouseleave', () => {
+                if (!timeout) {
+                    timeout = setTimeout(() => this._dismiss(flash), 1200);
+                }
+            });
+        } else {
+            const timer = flash.querySelector('.flash-timer');
+            if (timer) timer.remove();
         }
 
         this._cleanupOverflow();
