@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Ui;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,24 +14,24 @@ class ModalController extends AbstractController
     {
         $title = $request->get('title') ?? 'ce disque';
 
-        return $this->render('modal/_confirm.html.twig', ['title' => $title]);
+        return $this->render('_layout/modal/_confirm.html.twig', ['title' => $title]);
     }
 
     #[Route('/modal/moods', name: 'modal_moods')]
     public function moods(Request $request): Response
     {
-        return $this->render('modal/_moods.html.twig', ['initial' => $request->get('initial') ?? '']);
+        return $this->render('_layout/modal/_moods.html.twig', ['initial' => $request->get('initial') ?? '']);
     }
 
     #[Route('/modal/playlists', name: 'modal_playlists')]
     public function playlists(Request $request): Response
     {
-        return $this->render('modal/_playlists.html.twig', ['initial' => $request->get('initial') ?? '']);
+        return $this->render('_layout/modal/_playlists.html.twig', ['initial' => $request->get('initial') ?? '']);
     }
 
     #[Route('/modal/logout', name: 'modal_logout')]
     public function logout(): Response
     {
-        return $this->render('modal/_logout.html.twig');
+        return $this->render('_layout/modal/_logout.html.twig');
     }
 }

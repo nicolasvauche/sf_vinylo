@@ -2,7 +2,7 @@
 
 namespace App\Tests\Entity;
 
-use App\Entity\User;
+use App\Entity\User\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
