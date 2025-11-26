@@ -1,0 +1,36 @@
+.form-group {
+    margin-bottom: 2rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    &:has(> .group-info > ul) {
+        .group-widget {
+            border-color: $danger;
+        }
+    }
+
+    .group-widget {
+        position: relative;
+        padding: 0.5rem;
+        border: 1px solid $primary;
+        border-radius: 0.5rem;
+
+        &:has(:invalid) {
+            border-color: $danger;
+        }
+
+        &:has(:valid) {
+            border-color: $success;
+        }
+
+        @import "../../components/form/label";
+        @import "../../components/form/control";
+    }
+
+    .group-info {
+        @import "../../components/form/help";
+        @import "../../components/form/error";
+    }
+}

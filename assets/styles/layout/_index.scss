@@ -8,7 +8,9 @@ html {
     }
 
     .turbo-progress-bar {
-        display: none !important;
+        height: 0.5rem;
+        background-color: $success;
+        border-bottom-right-radius: 0.25rem;
     }
 
     body {

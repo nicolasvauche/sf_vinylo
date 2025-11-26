@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block bodyclass %}profile{% endblock %}
+
+{% block body %}
+    {% include "_layout/user/_header.html.twig" %}
+
+    {% include "_layout/user/_headline.html.twig" %}
+
+    <main class="app-main">
+        {% block main %}{% endblock %}
+    </main>
+{% endblock %}
