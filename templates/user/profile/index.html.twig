@@ -1,0 +1,11 @@
+{% extends '_layout/user/_profile.html.twig' %}
+
+{% block title %}Votre compte{% endblock %}
+
+{% block main %}
+    <main class="app-main">
+        <div class="tabs-panel" data-tabs--tabs-target="panel" data-tab-id="infos">
+            {% include "user/profile/_form.html.twig" %}
+        </div>
+    </main>
+{% endblock %}

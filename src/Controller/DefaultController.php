@@ -40,12 +40,6 @@ final class DefaultController extends AbstractController
         return $this->render('default/flow.html.twig');
     }
 
-    #[Route('/profil', name: 'app_profile')]
-    public function profile(): Response
-    {
-        return $this->render('default/profile.html.twig');
-    }
-
     #[Route('/profil/supprimer', name: 'account_delete')]
     public function accountDelete(): Response
     {
