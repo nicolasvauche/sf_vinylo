@@ -25,6 +25,23 @@
             border-color: $success;
         }
 
+        .item {
+            @include displayGrid(35% 35% 1fr, 0.5rem);
+            align-items: center;
+
+            & > span {
+                box-sizing: border-box;
+                padding: 0.5rem 1rem;
+                width: 100%;
+            }
+
+            .actions {
+                @include displayFlex(null, center, 0.25rem);
+
+                @import "../../components/form/button";
+            }
+        }
+
         @import "../../components/form/label";
         @import "../../components/form/control";
     }
