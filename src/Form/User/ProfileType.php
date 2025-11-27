@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class RegisterType extends AbstractType
+class ProfileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -43,9 +43,10 @@ class RegisterType extends AbstractType
                 ],
             ])
             ->add('password', PasswordType::class, [
-                'required' => true,
+                'required' => false,
+                'mapped' => false,
                 'label' => 'Votre mot de passe',
-                'help' => 'Minimum 6 caractères',
+                'help' => 'Laissez-le vide pour ne pas le modifier',
                 'label_attr' => [
                     'class' => 'form-label',
                 ],
