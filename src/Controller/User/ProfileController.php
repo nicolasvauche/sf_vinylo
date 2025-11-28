@@ -95,10 +95,15 @@ final class ProfileController extends AbstractController
         Security $security,
         DeleteUserService $deleteUserService
     ): RedirectResponse {
-        $deleteUserService->markUserAsDeleted($this->getUser());
+        $user = $this->getUser();
+        $deleteUserService->markUserAsDeleted($user);
+        $daysBeforeRemove = $deleteUserService->getDaysBeforeRemove($user);
         $security->logout(false);
 
-        $this->addFlash('warning', 'Votre compte a été désactivé<br/>Il sera supprimé dans 30 jours<br/>Pour le récupérer, <a href="#">contactez-nous</a>');
+        $this->addFlash(
+            'warning',
+            "Votre compte a été désactivé.<br/>Il sera supprimé dans $daysBeforeRemove jour".($daysBeforeRemove > 1 ? 's' : '').".<br/>Pour le récupérer, <a href=\"#\">contactez-nous</a>"
+        );
 
         return $this->redirectToRoute('app_logout', [], Response::HTTP_SEE_OTHER);
     }

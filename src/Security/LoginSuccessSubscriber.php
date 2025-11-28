@@ -39,7 +39,7 @@ final class LoginSuccessSubscriber implements EventSubscriberInterface
         $session?->getFlashBag()->add(
             'success',
             sprintf(
-                'Heureux de vous revoir %s !',
+                'Heureux de vous revoir, %s&nbsp;!',
                 $user->getPseudo() ?: ''
             )
         );

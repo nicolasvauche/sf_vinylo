@@ -36,4 +36,26 @@ readonly class DeleteUserService
         $this->entityManager->remove($user);
         $this->entityManager->flush();
     }
+
+    public function getDaysBeforeRemove(UserInterface $authenticatedUser): int
+    {
+        $user = $this->userRepository->find($authenticatedUser->getId());
+        if (!$user) {
+            return 0;
+        }
+
+        $deletedAt = $user->getDeletedAt();
+        if ($deletedAt === null) {
+            return 0;
+        }
+
+        $deadline = $deletedAt->modify('+31 days');
+        $now = new \DateTimeImmutable();
+
+        if ($now >= $deadline) {
+            return 0;
+        }
+
+        return (int)$now->diff($deadline)->format('%a');
+    }
 }
