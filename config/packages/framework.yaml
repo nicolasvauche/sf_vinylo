@@ -8,6 +8,11 @@ framework:
     #esi: true
     #fragments: true
 
+    http_client:
+        default_options:
+            headers:
+                User-Agent: 'Vinylo/1.0 (+hello@nicolasvauche.net)'
+
 when@test:
     framework:
         test: true

@@ -2,6 +2,7 @@ twig:
     file_name_pattern: '*.twig'
     globals:
         app_locale: '%app.locale%'
+        app_userLocationService: '@App\Service\Location\UserLocationService'
 
 when@test:
     twig:

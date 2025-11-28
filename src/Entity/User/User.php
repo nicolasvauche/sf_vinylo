@@ -2,7 +2,10 @@
 
 namespace App\Entity\User;
 
+use App\Entity\Location\UserLocation;
 use App\Repository\User\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -52,6 +55,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastLoginAt = null;
+
+    /**
+     * @var Collection<int, UserLocation>
+     */
+    #[ORM\OneToMany(targetEntity: UserLocation::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $userLocations;
+
+    public function __construct()
+    {
+        $this->userLocations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -190,6 +204,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastLoginAt(?\DateTimeImmutable $lastLoginAt): static
     {
         $this->lastLoginAt = $lastLoginAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserLocation>
+     */
+    public function getUserLocations(): Collection
+    {
+        return $this->userLocations;
+    }
+
+    public function addUserLocation(UserLocation $userLocation): static
+    {
+        if (!$this->userLocations->contains($userLocation)) {
+            $this->userLocations->add($userLocation);
+            $userLocation->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserLocation(UserLocation $userLocation): static
+    {
+        if ($this->userLocations->removeElement($userLocation)) {
+            // set the owning side to null (unless already changed)
+            if ($userLocation->getOwner() === $this) {
+                $userLocation->setOwner(null);
+            }
+        }
 
         return $this;
     }
