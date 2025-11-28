@@ -49,6 +49,8 @@
                         {{ ux_icon('fa7-solid:trash-alt', {'class': 'app-icon'}) }}
                     </button>
                 </div>
+            {% else %}
+                <p class="no-result">Aucune localisation enregistrée…</p>
             {% endfor %}
         </div>
     </div>

@@ -18,11 +18,11 @@
     }
 
     .suggest-empty {
-        margin: .25rem 0;
+        margin: 0.25rem 0;
         padding: .5rem .5rem;
-        color: rgba($secondary, .7);
         font-size: .85rem;
         font-style: italic;
+        color: $primary;
     }
 }
 

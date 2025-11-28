@@ -16,21 +16,27 @@ final class AddLocationType extends AbstractType
         $builder->add('label', TextType::class, [
             'required' => true,
             'label' => 'Label',
-            'label_attr' => ['class' => 'form-label'],
+            'label_attr' => [
+                'class' => 'form-label',
+            ],
             'attr' => [
                 'class' => 'form-control',
-                'placeholder' => 'Label',
+                'placeholder' => 'ex: "à la maison"',
             ],
-            'help_attr' => ['class' => 'help'],
+            'help_attr' => [
+                'class' => 'help',
+            ],
         ]);
 
         $builder->add('addressInput', TextType::class, [
             'required' => true,
-            'label' => 'Adresse',
-            'label_attr' => ['class' => 'form-label'],
+            'label' => 'Ville',
+            'label_attr' => [
+                'class' => 'form-label',
+            ],
             'attr' => [
                 'class' => 'form-control',
-                'placeholder' => 'Adresse',
+                'placeholder' => 'Ville',
                 'autocomplete' => 'off',
                 'aria-autocomplete' => 'list',
                 'aria-expanded' => 'false',
@@ -40,7 +46,9 @@ final class AddLocationType extends AbstractType
                 'data-location--autocomplete-target' => 'input',
                 'data-action' => 'input->location--autocomplete#onInput keydown->location--autocomplete#onKeydown',
             ],
-            'help_attr' => ['class' => 'help'],
+            'help_attr' => [
+                'class' => 'help',
+            ],
         ]);
 
         $hidden = static fn(array $extra = []) => array_merge([

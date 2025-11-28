@@ -164,7 +164,7 @@ export default class extends Controller {
         this._activeIndex = -1;
 
         if (!Array.isArray(items) || items.length === 0) {
-            this._showMessage('Aucune suggestion');
+            this._showMessage('Aucune suggestion, modifiez votre recherche…');
             return;
         }
 
@@ -195,7 +195,7 @@ export default class extends Controller {
     }
 
     _showMessage(text) {
-        this.listTarget.innerHTML = `<div class="suggest-empty">${this._escape(text)}</div>`;
+        this.listTarget.innerHTML = `<div class="no-result">${this._escape(text)}</div>`;
         this.listTarget.hidden = false;
         this.inputTarget.setAttribute('aria-expanded', 'true');
     }
