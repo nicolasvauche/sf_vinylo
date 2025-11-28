@@ -1,0 +1,69 @@
+{{ form_start(locationForm, {'attr': {'class': 'app-form'}}) }}
+<fieldset class="form-fieldset">
+    <legend class="form-legend">Vos Localisations</legend>
+
+    <div class="form-group">
+        <div class="group-widget">
+            <label class="form-label">Enregistrées</label>
+            {% for userLocation in app_userLocationService.userLocations(app.user) %}
+                <div class="item">
+                    <span>{{ userLocation.label }}</span>
+                    <span>{{ userLocation.address.city }}</span>
+                    <div class="actions">
+                        <input type="radio" name="current" id="current-{{ userLocation.id }}" class="form-control" {% if userLocation.isCurrent %}checked="checked"{% endif %}/>
+                        <button
+                            type="button"
+                            class="form-button text-danger"
+                            data-controller="modal--modal-opener"
+                            data-modal--modal-opener-modal-value="#app-modal"
+                            data-modal--modal-opener-variant-value="confirm"
+                            data-modal--modal-opener-size-value="s"
+                            data-modal--modal-opener-title-value="Supprimer ce lieu ?"
+                            data-modal--modal-opener-body-url-value="{{ path('modal_confirm', { title: 'cette localisation' }) }}"
+                            data-modal--modal-opener-footer-html-value='
+        <button type="button" data-action="modal--modal#close">Annuler</button>
+        <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Supprimer</button>
+      '
+                            data-action="click->modal--modal-opener#open"
+                            data-modal--modal-opener-action-url-value="{{ path('app_profile') }}#localisations">
+                            {{ ux_icon('fa7-solid:trash-alt', {'class': 'app-icon'}) }}
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div
+            class="group-widget"
+            data-controller="location--autocomplete"
+            data-location--autocomplete-endpoint-value="{{ path('api_geo_suggest') }}"
+            data-location--autocomplete-lang-value="fr"
+            data-location--autocomplete-limit-value="5"
+            data-location--autocomplete-debounce-value="350"
+        >
+            {{ form_label(locationForm.label) }}
+            <div class="app-grid two">
+                {{ form_widget(locationForm.label) }}
+                {{ form_widget(locationForm.addressInput) }}
+            </div>
+            <div class="suggestions" data-location--autocomplete-target="list" hidden></div>
+            {{ form_widget(locationForm.placeId) }}
+            {{ form_widget(locationForm.displayName) }}
+            {{ form_widget(locationForm.locality) }}
+            {{ form_widget(locationForm.countryCode) }}
+            {{ form_widget(locationForm.lat) }}
+            {{ form_widget(locationForm.lng) }}
+        </div>
+
+        <div class="group-info">
+            {{ form_errors(locationForm.addressInput) }}
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="form-fieldset controls">
+    <button type="submit" class="form-submit">Ajouter</button>
+</fieldset>
+{{ form_end(locationForm) }}

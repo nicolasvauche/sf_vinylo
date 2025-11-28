@@ -1,0 +1,14 @@
+.suggestions {
+    .suggest-item {
+        margin-bottom: 0.5rem;
+        color: $secondary;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        & > small {
+            color: $primary;
+        }
+    }
+}
