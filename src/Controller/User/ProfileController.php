@@ -6,8 +6,10 @@ use App\Dto\Location\AddLocationDto;
 use App\Form\Location\AddLocationType;
 use App\Form\User\ProfileType;
 use App\Service\Location\LocationManager;
+use App\Service\User\DeleteUserService;
 use App\Service\User\EditUserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -86,5 +88,36 @@ final class ProfileController extends AbstractController
         $this->addFlash('danger', 'Votre localisation a été supprimée');
 
         return $this->redirect($this->generateUrl('app_profile').'#localisations', Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/profil/demande-de-suppression', name: 'app_profile_mark_as_deleted')]
+    public function markAccountAsDeleted(
+        Security $security,
+        DeleteUserService $deleteUserService
+    ): RedirectResponse {
+        $user = $this->getUser();
+        $deleteUserService->markUserAsDeleted($user);
+        $daysBeforeRemove = $deleteUserService->getDaysBeforeRemove($user);
+        $security->logout(false);
+
+        $this->addFlash(
+            'warning',
+            "Votre compte a été désactivé.<br/>Il sera supprimé dans $daysBeforeRemove jour".($daysBeforeRemove > 1 ? 's' : '').".<br/>Pour le récupérer, <a href=\"#\">contactez-nous</a>"
+        );
+
+        return $this->redirectToRoute('app_logout', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/profil/supprimer', name: 'app_profile_delete')]
+    public function deleteAccount(
+        Security $security,
+        DeleteUserService $deleteUserService
+    ): RedirectResponse {
+        $deleteUserService->hardDeleteUser($this->getUser());
+        $security->logout(false);
+
+        $this->addFlash('danger', 'Votre compte a été supprimé');
+
+        return $this->redirectToRoute('app_logout', [], Response::HTTP_SEE_OTHER);
     }
 }

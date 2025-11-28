@@ -10,10 +10,11 @@
 .app-flash {
     pointer-events: auto;
     overflow: hidden;
-    @include displayFlex(space-between, center);
-    flex-wrap: wrap;
+    @include displayGrid(1fr 3rem);
+    align-items: center;
     margin: 0.5rem auto;
     width: 100%;
+    line-height: 1.25rem;
     color: $primary;
     background-color: $white;
     border-radius: .9rem;
@@ -25,9 +26,15 @@
 
     .flash-body {
         padding: .75rem 1rem;
+
+        a {
+            text-decoration: underline;
+            color: $fourth;
+        }
     }
 
     .flash-close {
+        margin-left: 0.5rem;
         padding: .5rem .75rem;
         font-size: 1.5rem;
         color: $white;
@@ -37,7 +44,7 @@
     }
 
     .flash-timer {
-        width: 100%;
+        grid-column: 1/2;
         height: 3px;
         background: rgba($black, .08);
 

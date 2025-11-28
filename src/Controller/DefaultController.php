@@ -39,12 +39,4 @@ final class DefaultController extends AbstractController
     {
         return $this->render('default/flow.html.twig');
     }
-
-    #[Route('/profil/supprimer', name: 'account_delete')]
-    public function accountDelete(): Response
-    {
-        $this->addFlash('danger', 'Votre compte a été supprimé');
-
-        return $this->redirectToRoute('app_register');
-    }
 }

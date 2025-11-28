@@ -75,7 +75,7 @@
         padding: .5rem 1rem 1rem;
         overflow: auto;
         overscroll-behavior: contain;
-        min-height: 2.5rem;
+        max-height: 50dvh;
         line-height: 1.25rem;
 
         ul {
