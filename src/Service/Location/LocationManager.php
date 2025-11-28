@@ -86,8 +86,23 @@ final class LocationManager
             throw new \RuntimeException('Localisation introuvable pour cet utilisateur.');
         }
 
-        $this->em->remove($loc);
-        $this->em->flush();
+        $address = $loc->getAddress();
+
+        $conn = $this->em->getConnection();
+        $conn->beginTransaction();
+        try {
+            $this->em->remove($loc);
+            $this->em->flush();
+
+            if ($address instanceof Address) {
+                $this->deleteAddressIfOrphan($address);
+            }
+
+            $conn->commit();
+        } catch (\Throwable $e) {
+            $conn->rollBack();
+            throw $e;
+        }
     }
 
     private function assertSuggestionSelected(AddLocationDto $dto): void
@@ -191,5 +206,14 @@ final class LocationManager
     private function roundCoord(string|float|int $value): string
     {
         return number_format((float)$value, 6, '.', '');
+    }
+
+    private function deleteAddressIfOrphan(Address $address): void
+    {
+        $count = $this->userLocationRepository->count(['address' => $address]);
+        if ($count === 0) {
+            $this->em->remove($address);
+            $this->em->flush();
+        }
     }
 }

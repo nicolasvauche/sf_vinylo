@@ -1,0 +1,55 @@
+<div class="form-group">
+    <div class="group-widget">
+        <label class="form-label">Enregistrées</label>
+
+        <div class="radio-cards"
+             role="radiogroup"
+             aria-label="Vos localisations enregistrées"
+             data-controller="location--select"
+             data-location--select-url-value="{{ path('app_profile_location_select', { id: 0 }) }}"
+             data-location--select-paramname-value="id"
+        >
+            {% for userLocation in app_userLocationService.userLocations(app.user) %}
+                <div class="radio-card"
+                     data-action="click->location--select#select"
+                     data-id="{{ userLocation.id }}"
+                >
+                    <input
+                        type="radio"
+                        class="input"
+                        name="current"
+                        id="current-{{ userLocation.id }}"
+                        {% if userLocation.isCurrent %}checked="checked"{% endif %}
+                    />
+
+                    <label class="label" for="current-{{ userLocation.id }}">
+                        <div class="dot" aria-hidden="true"></div>
+                        <div class="body">
+                            <div class="title">{{ userLocation.label }}</div>
+                            <div class="meta">{{ userLocation.address.city }}</div>
+                        </div>
+                    </label>
+
+                    <button
+                        type="button"
+                        class="delete form-button text-danger"
+                        data-controller="modal--modal-opener"
+                        data-modal--modal-opener-modal-value="#app-modal"
+                        data-modal--modal-opener-variant-value="confirm"
+                        data-modal--modal-opener-size-value="s"
+                        data-modal--modal-opener-title-value="Supprimer ce lieu ?"
+                        data-modal--modal-opener-body-url-value="{{ path('modal_confirm', { title: userLocation.label }) }}"
+                        data-modal--modal-opener-footer-html-value='
+        <button type="button" data-action="modal--modal#close">Annuler</button>
+        <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Supprimer</button>
+      '
+                        data-action="click->modal--modal-opener#open"
+                        data-modal--modal-opener-action-url-value="{{ path('app_profile_location_delete', {'id': userLocation.id}) }}"
+                    >
+                        {{ ux_icon('fa7-solid:trash-alt', {'class': 'app-icon'}) }}
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

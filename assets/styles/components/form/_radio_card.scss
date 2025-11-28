@@ -1,0 +1,96 @@
+.radio-cards {
+    @include displayGrid(null, 0.5rem);
+    margin: 0.25rem 0 0 0;
+
+    .radio-card {
+        position: relative;
+        @include displayGrid(1fr auto);
+        align-items: center;
+        min-height: 58px;
+
+        .input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+
+            &:checked + .label {
+                background-color: rgba($success, 0.25);
+                box-shadow: 0 0 0 2px rgba($primary, 0.1);
+
+                .dot::after {
+                    transform: scale(1);
+                }
+            }
+        }
+
+        .label {
+            @include displayGrid(20px 1fr 42px, 0.5rem);
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            padding-right: 3rem;
+            color: $primary;
+            background-color: rgba($black, 0.025);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 6px rgba($black, 0.05);
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+
+            .dot {
+                position: relative;
+                width: 16px;
+                height: 16px;
+                border: 2px solid $primary;
+                border-radius: 50%;
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    inset: 3px;
+                    background-color: $primary;
+                    border-radius: 50%;
+                    transform: scale(0);
+                    transition: transform .12s ease;
+                }
+            }
+
+            .body {
+                min-width: 0;
+                @include displayFlex(null, null, null, column);
+                line-height: 1.1;
+
+                .title {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    font-size: 0.95rem;
+                    font-weight: bold;
+                    text-overflow: ellipsis;
+                }
+
+                .meta {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    font-size: 0.8rem;
+                    color: rgba($black, 0.6);
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+
+        .delete {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            z-index: 1;
+            padding: 0.25rem;
+            line-height: 1;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            transform: translateY(-50%);
+
+            .app-icon {
+                font-size: 1rem;
+            }
+        }
+    }
+}

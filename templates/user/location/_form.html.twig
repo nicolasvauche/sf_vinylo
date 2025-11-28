@@ -2,59 +2,35 @@
 <fieldset class="form-fieldset">
     <legend class="form-legend">Vos Localisations</legend>
 
-    <div class="form-group">
-        <div class="group-widget">
-            <label class="form-label">Enregistrées</label>
-            {% for userLocation in app_userLocationService.userLocations(app.user) %}
-                <div class="item">
-                    <span>{{ userLocation.label }}</span>
-                    <span>{{ userLocation.address.city }}</span>
-                    <div class="actions">
-                        <input type="radio" name="current" id="current-{{ userLocation.id }}" class="form-control" {% if userLocation.isCurrent %}checked="checked"{% endif %}/>
-                        <button
-                            type="button"
-                            class="form-button text-danger"
-                            data-controller="modal--modal-opener"
-                            data-modal--modal-opener-modal-value="#app-modal"
-                            data-modal--modal-opener-variant-value="confirm"
-                            data-modal--modal-opener-size-value="s"
-                            data-modal--modal-opener-title-value="Supprimer ce lieu ?"
-                            data-modal--modal-opener-body-url-value="{{ path('modal_confirm', { title: userLocation.label }) }}"
-                            data-modal--modal-opener-footer-html-value='
-        <button type="button" data-action="modal--modal#close">Annuler</button>
-        <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Supprimer</button>
-      '
-                            data-action="click->modal--modal-opener#open"
-                            data-modal--modal-opener-action-url-value="{{ path('app_profile_location_delete', {'id': userLocation.id}) }}">
-                            {{ ux_icon('fa7-solid:trash-alt', {'class': 'app-icon'}) }}
-                        </button>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
+    {% include "user/location/_user_locations.html.twig" %}
 
     <div class="form-group">
         <div
-            class="group-widget"
+            class="group-widget autocomplete"
             data-controller="location--autocomplete"
             data-location--autocomplete-endpoint-value="{{ path('api_geo_suggest') }}"
             data-location--autocomplete-lang-value="fr"
             data-location--autocomplete-limit-value="5"
             data-location--autocomplete-debounce-value="350"
         >
-            {{ form_label(locationForm.label) }}
+            <label class="form-label">Ajouter</label>
+
             <div class="app-grid two">
                 {{ form_widget(locationForm.label) }}
                 {{ form_widget(locationForm.addressInput) }}
+                <div class="suggest-loader" data-location--autocomplete-target="loader" hidden aria-hidden="true">
+                    {{ ux_icon('si:spinner-fill', {'class': 'spinner'}) }}
+                </div>
             </div>
-            <div class="suggestions" data-location--autocomplete-target="list" hidden></div>
-            {{ form_widget(locationForm.placeId) }}
-            {{ form_widget(locationForm.displayName) }}
-            {{ form_widget(locationForm.locality) }}
-            {{ form_widget(locationForm.countryCode) }}
-            {{ form_widget(locationForm.lat) }}
-            {{ form_widget(locationForm.lng) }}
+
+            <div class="suggestions" id="geo-suggestions" data-location--autocomplete-target="list" hidden></div>
+
+            {{ form_widget(locationForm.placeId,     { attr: { 'data-location--autocomplete-target': 'placeId' } }) }}
+            {{ form_widget(locationForm.displayName, { attr: { 'data-location--autocomplete-target': 'displayName' } }) }}
+            {{ form_widget(locationForm.locality,    { attr: { 'data-location--autocomplete-target': 'locality' } }) }}
+            {{ form_widget(locationForm.countryCode, { attr: { 'data-location--autocomplete-target': 'countryCode' } }) }}
+            {{ form_widget(locationForm.lat,         { attr: { 'data-location--autocomplete-target': 'lat' } }) }}
+            {{ form_widget(locationForm.lng,         { attr: { 'data-location--autocomplete-target': 'lng' } }) }}
         </div>
 
         <div class="group-info">

@@ -64,6 +64,18 @@ final class ProfileController extends AbstractController
         );
     }
 
+    #[Route('/profil/localisation/choisir/{id}', name: 'app_profile_location_select')]
+    public function selectLocation(
+        LocationManager $locationManager,
+        string $id
+    ): RedirectResponse {
+        $locationManager->setCurrent($this->getUser(), $id);
+
+        $this->addFlash('info', 'Votre localisation a changé');
+
+        return $this->redirect($this->generateUrl('app_profile').'#localisations', Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/profil/localisation/supprimer/{id}', name: 'app_profile_location_delete')]
     public function deleteLocation(
         LocationManager $locationManager,

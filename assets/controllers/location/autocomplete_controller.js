@@ -2,7 +2,7 @@ import {Controller} from '@hotwired/stimulus';
 
 export default class extends Controller {
     static targets = [
-        'input', 'list',
+        'input', 'list', 'loader',
         'placeId', 'displayName', 'locality', 'countryCode', 'lat', 'lng'
     ];
 
@@ -11,7 +11,9 @@ export default class extends Controller {
         min: {type: Number, default: 3},
         debounce: {type: Number, default: 350},
         lang: {type: String, default: 'fr'},
-        limit: {type: Number, default: 5}
+        limit: {type: Number, default: 5},
+        retryMax: {type: Number, default: 3},
+        retryDelay: {type: Number, default: 400},
     };
 
     connect() {
@@ -96,16 +98,65 @@ export default class extends Controller {
         url.searchParams.set('limit', String(this.limitValue));
         url.searchParams.set('lang', this.langValue);
 
+        this._setLoading(true);
+
         try {
-            const resp = await fetch(url.toString(), {signal: this._aborter.signal});
-            if (!resp.ok) {
-                this._clearList();
-                return;
-            }
-            const data = await resp.json();
+            const data = await this._fetchWithRetry(url.toString(), {signal: this._aborter.signal});
             this._renderList(data);
-        } catch (_) {
-            this._clearList();
+        } catch (err) {
+            if (err?.name === 'AbortError') {
+                this._clearList();
+            } else {
+                this._showMessage(
+                    `Service indisponible. Réessaie plus tard.`
+                );
+            }
+        } finally {
+            this._setLoading(false);
+        }
+    }
+
+    async _fetchWithRetry(url, options = {}) {
+        let attempt = 0;
+        let delay = this.retryDelayValue;
+
+        const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
+        while (true) {
+            attempt++;
+
+            if (options.signal?.aborted) {
+                throw new DOMException('Aborted', 'AbortError');
+            }
+
+            try {
+                const resp = await fetch(url, options);
+
+                if (resp.status === 503) {
+                    if (attempt >= this.retryMaxValue) {
+                        throw new Error('ServiceUnavailable');
+                    }
+                    await sleep(delay);
+                    delay *= 2;
+                    continue;
+                }
+
+                if (!resp.ok) {
+                    throw new Error(`HTTP_${resp.status}`);
+                }
+
+                return await resp.json();
+            } catch (e) {
+                const isAbort = e?.name === 'AbortError';
+                if (isAbort) throw e;
+
+                if (attempt < this.retryMaxValue) {
+                    await sleep(delay);
+                    delay *= 2;
+                    continue;
+                }
+                throw e;
+            }
         }
     }
 
@@ -113,8 +164,7 @@ export default class extends Controller {
         this._activeIndex = -1;
 
         if (!Array.isArray(items) || items.length === 0) {
-            this.listTarget.innerHTML = `<div class="suggest-empty">Aucune suggestion</div>`;
-            this.listTarget.hidden = false;
+            this._showMessage('Aucune suggestion');
             return;
         }
 
@@ -141,6 +191,13 @@ export default class extends Controller {
     `).join('');
 
         this.listTarget.hidden = false;
+        this.inputTarget.setAttribute('aria-expanded', 'true');
+    }
+
+    _showMessage(text) {
+        this.listTarget.innerHTML = `<div class="suggest-empty">${this._escape(text)}</div>`;
+        this.listTarget.hidden = false;
+        this.inputTarget.setAttribute('aria-expanded', 'true');
     }
 
     _highlight(items) {
@@ -162,6 +219,12 @@ export default class extends Controller {
         this.listTarget.innerHTML = '';
         this.listTarget.hidden = true;
         this._activeIndex = -1;
+        this.inputTarget.setAttribute('aria-expanded', 'false');
+    }
+
+    _setLoading(on) {
+        if (this.hasLoaderTarget) this.loaderTarget.hidden = !on;
+        this.inputTarget.toggleAttribute('aria-busy', on);
     }
 
     _debounce(fn, delay) {

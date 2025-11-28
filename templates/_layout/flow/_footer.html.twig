@@ -1,6 +1,7 @@
 <footer class="app-section headline">
     <div class="app-links">
-        <p class="moment">Un vendredi après-midi d'hiver à la maison…</p>
+        <p class="moment">Un vendredi après-midi d'hiver {{ app_userLocationService.currentUserLocation(app.user).label }}</p>
+
         <button
             type="button"
             data-controller="modal--modal-opener"
@@ -17,6 +18,7 @@
             {{ ux_icon('material-symbols:playlist-play', {'class': 'app-icon'}) }}
             Playlists
         </button>
+
         <button
             type="button"
             class="active"
