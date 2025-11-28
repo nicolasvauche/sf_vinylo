@@ -2,7 +2,6 @@
 
 namespace App\Service\User;
 
-use App\Entity\User\User;
 use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -11,7 +10,8 @@ readonly class DeleteUserService
 {
     public function __construct(
         private UserRepository $userRepository,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private int $deletionDelayDays = 30
     ) {
     }
 
@@ -49,13 +49,11 @@ readonly class DeleteUserService
             return 0;
         }
 
-        $deadline = $deletedAt->modify('+31 days');
-        $now = new \DateTimeImmutable();
+        $deadline = $deletedAt->modify(sprintf('+%d days', $this->deletionDelayDays));
+        $todayStart = new \DateTimeImmutable('today');
+        $seconds = $deadline->getTimestamp() - $todayStart->getTimestamp();
+        $days = (int)floor($seconds / 86400) + 1;
 
-        if ($now >= $deadline) {
-            return 0;
-        }
-
-        return (int)$now->diff($deadline)->format('%a');
+        return max(0, min($this->deletionDelayDays, $days));
     }
 }
