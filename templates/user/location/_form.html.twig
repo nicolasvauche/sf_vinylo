@@ -19,13 +19,13 @@
                             data-modal--modal-opener-variant-value="confirm"
                             data-modal--modal-opener-size-value="s"
                             data-modal--modal-opener-title-value="Supprimer ce lieu ?"
-                            data-modal--modal-opener-body-url-value="{{ path('modal_confirm', { title: 'cette localisation' }) }}"
+                            data-modal--modal-opener-body-url-value="{{ path('modal_confirm', { title: userLocation.label }) }}"
                             data-modal--modal-opener-footer-html-value='
         <button type="button" data-action="modal--modal#close">Annuler</button>
         <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Supprimer</button>
       '
                             data-action="click->modal--modal-opener#open"
-                            data-modal--modal-opener-action-url-value="{{ path('app_profile') }}#localisations">
+                            data-modal--modal-opener-action-url-value="{{ path('app_profile_location_delete', {'id': userLocation.id}) }}">
                             {{ ux_icon('fa7-solid:trash-alt', {'class': 'app-icon'}) }}
                         </button>
                     </div>

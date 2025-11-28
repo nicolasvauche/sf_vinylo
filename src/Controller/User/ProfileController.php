@@ -8,6 +8,7 @@ use App\Form\User\ProfileType;
 use App\Service\Location\LocationManager;
 use App\Service\User\EditUserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -61,5 +62,17 @@ final class ProfileController extends AbstractController
             ],
             new Response(null, $hasError ? 422 : 200)
         );
+    }
+
+    #[Route('/profil/localisation/supprimer/{id}', name: 'app_profile_location_delete')]
+    public function deleteLocation(
+        LocationManager $locationManager,
+        string $id
+    ): RedirectResponse {
+        $locationManager->removeUserLocation($this->getUser(), $id);
+
+        $this->addFlash('danger', 'Votre localisation a été supprimée');
+
+        return $this->redirect($this->generateUrl('app_profile').'#localisations', Response::HTTP_SEE_OTHER);
     }
 }

@@ -2,6 +2,7 @@
     .suggest-item {
         margin-bottom: 0.5rem;
         color: $secondary;
+        cursor: pointer;
 
         &:last-child {
             margin-bottom: 0;
