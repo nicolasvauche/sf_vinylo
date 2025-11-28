@@ -18,7 +18,7 @@ final readonly class UserLocationService
         return $this->repository->findBy(['owner' => $user]);
     }
 
-    public function getCurrentUserLocation(User $user): UserLocation
+    public function getCurrentUserLocation(User $user): ?UserLocation
     {
         return $this->repository->findOneBy(['owner' => $user, 'isCurrent' => true]);
     }
