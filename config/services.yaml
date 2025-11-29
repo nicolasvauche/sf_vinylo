@@ -20,5 +20,13 @@ services:
     App\:
         resource: '../src/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+#    App\Service\Discogs\DiscogsClient:
+#        arguments:
+#            $userAgent: '%env(string:DISCOGS_USER_AGENT)%'
+#            $baseUrl: '%env(string:DISCOGS_URL)%'
+#            $token: '%env(string:DISCOGS_TOKEN)%'
+#            $timeout: 2.5
+#            $cache: '@cache.app'
+#            $logger: '@monolog.logger.discogs'
+#            $debug: true
+#            $bypassCache: true

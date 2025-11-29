@@ -17,13 +17,13 @@ final class RecordTest extends TestCase
 
         $this->assertNull($record->getId());
         $this->assertNull($record->getTitle());
+        $this->assertNull($record->getTitleCanonical());
         $this->assertNull($record->getSlug());
         $this->assertNull($record->getYearOriginal());
-        $this->assertNull($record->getCoverUrl());
+        $this->assertNull($record->getCoverFile());
         $this->assertNull($record->getCoverHash());
         $this->assertNull($record->getDiscogsMasterId());
         $this->assertNull($record->getDiscogsReleaseId());
-        $this->assertNull($record->getSourceConfidence());
         $this->assertNull($record->getArtist());
         $this->assertCount(0, $record->getEditions());
     }
@@ -33,22 +33,31 @@ final class RecordTest extends TestCase
         $record = new Record();
 
         $this->assertSame($record, $record->setTitle('Legend'));
+        $this->assertSame('Legend', $record->getTitle());
+        $this->assertSame('legend', $record->getTitleCanonical());
+
         $this->assertSame($record, $record->setSlug('legend'));
         $this->assertSame($record, $record->setYearOriginal('1984'));
-        $this->assertSame($record, $record->setCoverUrl('https://exemple.test/legend.jpg'));
+        $this->assertSame($record, $record->setCoverFile('covers/legend.jpg'));
         $this->assertSame($record, $record->setCoverHash('abc123hash'));
         $this->assertSame($record, $record->setDiscogsMasterId('12345'));
         $this->assertSame($record, $record->setDiscogsReleaseId('67890'));
-        $this->assertSame($record, $record->setSourceConfidence(85));
 
-        $this->assertSame('Legend', $record->getTitle());
         $this->assertSame('legend', $record->getSlug());
         $this->assertSame('1984', $record->getYearOriginal());
-        $this->assertSame('https://exemple.test/legend.jpg', $record->getCoverUrl());
+        $this->assertSame('covers/legend.jpg', $record->getCoverFile());
         $this->assertSame('abc123hash', $record->getCoverHash());
         $this->assertSame('12345', $record->getDiscogsMasterId());
         $this->assertSame('67890', $record->getDiscogsReleaseId());
-        $this->assertSame(85, $record->getSourceConfidence());
+    }
+
+    public function testCanonicalizationDoesNotAlterTitleButUpdatesCanonical(): void
+    {
+        $record = new Record();
+
+        $this->assertSame($record, $record->setTitle("  The   Wall "));
+        $this->assertSame("  The   Wall ", $record->getTitle());
+        $this->assertSame('the wall', $record->getTitleCanonical());
     }
 
     public function testArtistAssociation(): void
@@ -64,7 +73,6 @@ final class RecordTest extends TestCase
     public function testAddEditionSetsBackReferenceAndIsIdempotent(): void
     {
         $record = (new Record())->setTitle('Legend');
-
         $edition = new Edition();
 
         $record->addEdition($edition);

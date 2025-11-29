@@ -17,7 +17,7 @@ class Edition
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $coverUrl = null;
+    private ?string $coverFile = null;
 
     #[ORM\Column]
     #[Gedmo\Timestampable(on: 'create')]
@@ -40,14 +40,14 @@ class Edition
         return $this->id;
     }
 
-    public function getCoverUrl(): ?string
+    public function getCoverFile(): ?string
     {
-        return $this->coverUrl;
+        return $this->coverFile;
     }
 
-    public function setCoverUrl(?string $coverUrl): static
+    public function setCoverFile(?string $coverFile): static
     {
-        $this->coverUrl = $coverUrl;
+        $this->coverFile = $coverFile;
 
         return $this;
     }

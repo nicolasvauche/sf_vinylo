@@ -1,6 +1,7 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - discogs
 
 when@dev:
     monolog:
@@ -14,6 +15,12 @@ when@dev:
                 type: console
                 process_psr_3_messages: false
                 channels: [ "!event", "!doctrine", "!console" ]
+            discogs:
+                type: stream
+                path: '%kernel.project_dir%/var/log/discogs.log'
+                level: debug
+                channels: [ 'discogs' ]
+                formatter: monolog.formatter.line
 
 when@test:
     monolog:

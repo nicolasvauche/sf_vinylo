@@ -16,6 +16,7 @@ final class ArtistTest extends TestCase
 
         $this->assertNull($artist->getId());
         $this->assertNull($artist->getName());
+        $this->assertNull($artist->getNameCanonical());
         $this->assertNull($artist->getSlug());
         $this->assertNull($artist->getCountryCode());
         $this->assertNull($artist->getCountryName());
@@ -28,16 +29,31 @@ final class ArtistTest extends TestCase
         $artist = new Artist();
 
         $this->assertSame($artist, $artist->setName('Bob Marley & The Wailers'));
+        $this->assertSame('Bob Marley & The Wailers', $artist->getName());
+        $this->assertSame('bob marley & the wailers', $artist->getNameCanonical());
+
         $this->assertSame($artist, $artist->setSlug('bob-marley-the-wailers'));
         $this->assertSame($artist, $artist->setCountryCode('JM'));
         $this->assertSame($artist, $artist->setCountryName('Jamaica'));
         $this->assertSame($artist, $artist->setDiscogsArtistId('12345'));
 
-        $this->assertSame('Bob Marley & The Wailers', $artist->getName());
         $this->assertSame('bob-marley-the-wailers', $artist->getSlug());
         $this->assertSame('JM', $artist->getCountryCode());
         $this->assertSame('Jamaica', $artist->getCountryName());
         $this->assertSame('12345', $artist->getDiscogsArtistId());
+
+        $this->assertSame($artist, $artist->setNameCanonical('bob marley + wailers'));
+        $this->assertSame('Bob Marley & The Wailers', $artist->getName());
+        $this->assertSame('bob marley + wailers', $artist->getNameCanonical());
+    }
+
+    public function testCanonicalizationDoesNotAlterNameButUpdatesCanonical(): void
+    {
+        $artist = new Artist();
+        $artist->setName("   Pink    Floyd  ");
+
+        $this->assertSame("   Pink    Floyd  ", $artist->getName());
+        $this->assertSame('pink floyd', $artist->getNameCanonical());
     }
 
     public function testAddRecordSetsBackReferenceAndIsIdempotent(): void
