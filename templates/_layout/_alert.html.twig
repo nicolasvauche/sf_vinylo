@@ -14,7 +14,7 @@
                  role="{{ type in ['error','danger','warning'] ? 'alert' : 'status' }}"
                  style="--flash-duration: 5s;">
                 <div class="flash-body">
-                    <p class="flash-message">{{ message|raw }}</p>
+                    <p class="flash-message">{{ message | raw }}</p>
                 </div>
                 <button class="flash-close" type="button" aria-label="Fermer">×</button>
                 <div class="flash-timer" aria-hidden="true"></div>
@@ -31,5 +31,20 @@
          aria-live="polite"
          aria-atomic="true">
         {{ flashes_html | raw }}
+    </div>
+{% endif %}
+
+{% if error is defined and error %}
+    <div class="app-flashes"
+         data-controller="alert--alert"
+         data-alert--alert-max-value="5"
+         aria-live="polite"
+         aria-atomic="true">
+        <div class="app-flash bg-danger" role="alert">
+            <div class="flash-body">
+                <p class="flash-message">{{ error.messageKey | trans(error.messageData, 'security') | raw }}</p>
+            </div>
+            <button class="flash-close" type="button" aria-label="Fermer">×</button>
+        </div>
     </div>
 {% endif %}

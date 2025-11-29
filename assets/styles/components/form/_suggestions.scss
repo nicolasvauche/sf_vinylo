@@ -1,0 +1,46 @@
+.suggestions {
+    .suggest-item {
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        color: $secondary;
+        background-color: rgba($black, 0.025);
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 6px rgba($black, 0.05);
+        cursor: pointer;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        & > small {
+            color: $primary;
+        }
+    }
+
+    .suggest-empty {
+        margin: 0.25rem 0;
+        padding: .5rem .5rem;
+        font-size: .85rem;
+        font-style: italic;
+        color: $primary;
+    }
+}
+
+.suggest-loader {
+    position: absolute;
+    right: 0.75rem;
+    top: 1.7rem;
+    transform: translateY(-50%);
+    pointer-events: none;
+
+    .spinner {
+        font-size: 1.25rem;
+        animation: spin 1s linear infinite;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

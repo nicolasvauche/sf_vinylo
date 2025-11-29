@@ -2,7 +2,11 @@
 
 namespace App\Entity\User;
 
+use App\Entity\Location\UserLocation;
+use App\Entity\Vault\Collection\Edition;
 use App\Repository\User\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -11,7 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USER', columns: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'Cette adresse e-mail est déjà utilisée')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -52,6 +56,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastLoginAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
+    /**
+     * @var Collection<int, UserLocation>
+     */
+    #[ORM\OneToMany(targetEntity: UserLocation::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $userLocations;
+
+    /**
+     * @var Collection<int, Edition>
+     */
+    #[ORM\OneToMany(targetEntity: Edition::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $editions;
+
+    public function __construct()
+    {
+        $this->userLocations = new ArrayCollection();
+        $this->editions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -190,6 +215,78 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastLoginAt(?\DateTimeImmutable $lastLoginAt): static
     {
         $this->lastLoginAt = $lastLoginAt;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserLocation>
+     */
+    public function getUserLocations(): Collection
+    {
+        return $this->userLocations;
+    }
+
+    public function addUserLocation(UserLocation $userLocation): static
+    {
+        if (!$this->userLocations->contains($userLocation)) {
+            $this->userLocations->add($userLocation);
+            $userLocation->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserLocation(UserLocation $userLocation): static
+    {
+        if ($this->userLocations->removeElement($userLocation)) {
+            // set the owning side to null (unless already changed)
+            if ($userLocation->getOwner() === $this) {
+                $userLocation->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Edition>
+     */
+    public function getEditions(): Collection
+    {
+        return $this->editions;
+    }
+
+    public function addEdition(Edition $edition): static
+    {
+        if (!$this->editions->contains($edition)) {
+            $this->editions->add($edition);
+            $edition->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEdition(Edition $edition): static
+    {
+        if ($this->editions->removeElement($edition)) {
+            // set the owning side to null (unless already changed)
+            if ($edition->getOwner() === $this) {
+                $edition->setOwner(null);
+            }
+        }
 
         return $this;
     }

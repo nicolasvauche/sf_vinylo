@@ -1,0 +1,45 @@
+{{ form_start(locationForm, {'attr': {'class': 'app-form'}}) }}
+<fieldset class="form-fieldset">
+    <legend class="form-legend">Vos Localisations</legend>
+
+    {% include "user/location/_user_locations.html.twig" %}
+
+    <div class="form-group">
+        <div
+            class="group-widget autocomplete"
+            data-controller="location--autocomplete"
+            data-location--autocomplete-endpoint-value="{{ path('api_geo_suggest') }}"
+            data-location--autocomplete-lang-value="fr"
+            data-location--autocomplete-limit-value="5"
+            data-location--autocomplete-debounce-value="350"
+        >
+            <label class="form-label">Ajouter</label>
+
+            <div class="app-grid two">
+                {{ form_widget(locationForm.label) }}
+                {{ form_widget(locationForm.addressInput) }}
+                <div class="suggest-loader" data-location--autocomplete-target="loader" hidden aria-hidden="true">
+                    {{ ux_icon('si:spinner-fill', {'class': 'spinner'}) }}
+                </div>
+            </div>
+
+            <div class="suggestions" id="geo-suggestions" data-location--autocomplete-target="list" hidden></div>
+
+            {{ form_widget(locationForm.placeId,     { attr: { 'data-location--autocomplete-target': 'placeId' } }) }}
+            {{ form_widget(locationForm.displayName, { attr: { 'data-location--autocomplete-target': 'displayName' } }) }}
+            {{ form_widget(locationForm.locality,    { attr: { 'data-location--autocomplete-target': 'locality' } }) }}
+            {{ form_widget(locationForm.countryCode, { attr: { 'data-location--autocomplete-target': 'countryCode' } }) }}
+            {{ form_widget(locationForm.lat,         { attr: { 'data-location--autocomplete-target': 'lat' } }) }}
+            {{ form_widget(locationForm.lng,         { attr: { 'data-location--autocomplete-target': 'lng' } }) }}
+        </div>
+
+        <div class="group-info">
+            {{ form_errors(locationForm.addressInput) }}
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="form-fieldset controls">
+    <button type="submit" class="form-submit">Ajouter</button>
+</fieldset>
+{{ form_end(locationForm) }}

@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class RegisterController extends AbstractController
 {
-    #[Route('/nouvel-utilisateur', name: 'app_register')]
+    #[Route('/inscription', name: 'app_register')]
     public function index(
         Request $request,
         RegisterUserService $registerUserService

@@ -1,0 +1,19 @@
+.form-button {
+    box-sizing: border-box;
+    @include displayFlex(center, center);
+    padding: 0.25rem;
+    width: 100%;
+    font-family: $font-primary;
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    color: $secondary;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+
+    .app-icon {
+        font-size: 1.25rem;
+    }
+}

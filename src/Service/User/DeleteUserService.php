@@ -1,0 +1,59 @@
+<?php
+
+namespace App\Service\User;
+
+use App\Repository\User\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+readonly class DeleteUserService
+{
+    public function __construct(
+        private UserRepository $userRepository,
+        private EntityManagerInterface $entityManager,
+        private int $deletionDelayDays = 30
+    ) {
+    }
+
+    public function markUserAsDeleted(UserInterface $authenticatedUser): void
+    {
+        $user = $this->userRepository->find($authenticatedUser->getId());
+        if (!$user || $user->getDeletedAt()) {
+            return;
+        }
+
+        $user->setDeletedAt(new \DateTimeImmutable());
+        $this->entityManager->flush();
+    }
+
+    public function hardDeleteUser(UserInterface $authenticatedUser): void
+    {
+        $user = $this->userRepository->find($authenticatedUser->getId());
+        if (!$user) {
+            return;
+        }
+
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
+    }
+
+    public function getDaysBeforeRemove(UserInterface $authenticatedUser): int
+    {
+        $user = $this->userRepository->find($authenticatedUser->getId());
+        if (!$user) {
+            return 0;
+        }
+
+        $deletedAt = $user->getDeletedAt();
+        if ($deletedAt === null) {
+            return 0;
+        }
+
+        $deadline = $deletedAt->modify(sprintf('+%d days', $this->deletionDelayDays));
+        $todayStart = new \DateTimeImmutable('today');
+        $seconds = $deadline->getTimestamp() - $todayStart->getTimestamp();
+        $days = (int)floor($seconds / 86400) + 1;
+
+        return max(0, min($this->deletionDelayDays, $days));
+    }
+}

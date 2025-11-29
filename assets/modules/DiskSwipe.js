@@ -353,6 +353,7 @@ export default class DiskSwipe {
 
     delete() {
         const modalEl = document.getElementById('app-modal');
+        const title = this.card.dataset.title;
         const url = this.card.dataset.confirmUrl;
         const actionUrl = this.card.dataset.actionUrl;
 
@@ -362,7 +363,7 @@ export default class DiskSwipe {
             modalEl.dispatchEvent(new CustomEvent('modal:open', {
                 bubbles: true,
                 detail: {
-                    title: 'Supprimer ce disque ?',
+                    title: title,
                     variant: 'confirm',
                     size: 's',
                     bodyUrl: url,

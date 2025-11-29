@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block bodyclass %}profile{% endblock %}
+
+{% block body %}
+    {% include "_layout/user/_header.html.twig" %}
+
+    <section class="app-section headline">
+        <div class="app-links">
+            <button
+                type="button"
+                class="text-danger"
+                data-controller="modal--modal-opener"
+                data-modal--modal-opener-modal-value="#app-modal"
+                data-modal--modal-opener-variant-value="confirm"
+                data-modal--modal-opener-size-value="s"
+                data-modal--modal-opener-title-value="Supprimer votre compte"
+                data-modal--modal-opener-body-url-value="{{ path('modal_confirm', {
+                    message: 'Confirmez-vous la fermeture de votre compte&nbsp;?<br>Il sera <strong>définitivement supprimé</strong> dans 30 jours.'
+                }) }}"
+                data-modal--modal-opener-footer-html-value='
+        <button type="button" data-action="modal--modal#close">Annuler</button>
+        <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Fermer mon compte</button>
+      '
+                data-action="click->modal--modal-opener#open"
+                data-modal--modal-opener-action-url-value="{{ path('app_profile_mark_as_deleted') }}"
+            >
+                Supprimer votre compte
+            </button>
+
+            <button
+                type="button"
+                class="bg-danger"
+                data-controller="modal--modal-opener"
+                data-modal--modal-opener-modal-value="#app-modal"
+                data-modal--modal-opener-variant-value="confirm"
+                data-modal--modal-opener-size-value="s"
+                data-modal--modal-opener-title-value="Déconnexion"
+                data-modal--modal-opener-body-url-value="{{ path('modal_confirm', {
+                    message: 'Êtes-vous sûr de vouloir <strong>vous déconnecter</strong>&nbsp;?'
+                }) }}"
+                data-modal--modal-opener-footer-html-value='
+        <button type="button" data-action="modal--modal#close">Annuler</button>
+        <button type="button" data-primary class="bg-danger" data-action="modal--modal#confirm">Déconnexion</button>
+      '
+                data-action="click->modal--modal-opener#open"
+                data-modal--modal-opener-action-url-value="{{ path('app_logout') }}"
+            >
+                Déconnexion
+            </button>
+        </div>
+    </section>
+
+    <div
+        class="app-tabs"
+        data-controller="tabs--tabs"
+        data-tabs--tabs-storage-key-value="profile-tabs"
+        data-tabs--tabs-default-active-value="infos"
+    >
+        {% block main %}{% endblock %}
+
+        <footer class="app-footer-tabs">
+            <div class="tabs-list" role="tablist" aria-label="Sections du profil">
+                <button
+                    type="button"
+                    class="tabs-button"
+                    data-tabs--tabs-target="tab"
+                    data-tab-id="infos"
+                    data-action="click->tabs--tabs#click keydown->tabs--tabs#keydown"
+                >
+                    {{ ux_icon('mingcute:profile-fill', {'class': 'app-icon'}) }}
+                    Profil
+                </button>
+
+                <button
+                    type="button"
+                    class="tabs-button"
+                    data-tabs--tabs-target="tab"
+                    data-tab-id="localisations"
+                    data-action="click->tabs--tabs#click keydown->tabs--tabs#keydown"
+                >
+                    {{ ux_icon('icon-park-solid:local', {'class': 'app-icon'}) }}
+                    Localisations
+                </button>
+            </div>
+        </footer>
+    </div>
+{% endblock %}

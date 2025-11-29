@@ -48,7 +48,6 @@ class RegisterType extends AbstractType
                 'help' => 'Minimum 6 caractères',
                 'label_attr' => [
                     'class' => 'form-label',
-                    'autocomplete' => 'new-password',
                 ],
                 'attr' => [
                     'class' => 'form-control',

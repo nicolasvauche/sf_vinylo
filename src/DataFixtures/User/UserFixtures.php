@@ -11,7 +11,7 @@ class UserFixtures extends Fixture
 {
     const USERS = [
         [
-            'pseudo' => 'nicolas',
+            'pseudo' => 'Nicolas',
             'email' => 'nvauche@gmail.com',
             'password' => 'mJhGFyAf7Lzx',
         ],
