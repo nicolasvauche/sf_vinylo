@@ -7,7 +7,7 @@ use App\Repository\Location\UserLocationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserLocationRepository::class)]
-#[ORM\UniqueConstraint(columns: ['owner_id', 'address_id', 'label'])]
+#[ORM\UniqueConstraint('UNIQ_IDENTIFIER_USER_LOCATION', columns: ['owner_id', 'address_id', 'label'])]
 class UserLocation
 {
     #[ORM\Id]
