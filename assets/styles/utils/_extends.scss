@@ -36,12 +36,18 @@
     color: $danger !important;
 }
 
-/* ACTIONABLE */
+/* VISIBILITY */
 *[disabled] {
     cursor: not-allowed;
     pointer-events: none;
     opacity: 0.25;
     color: $white !important;
+}
+
+*[hidden] {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
 }
 
 /* INFOS */

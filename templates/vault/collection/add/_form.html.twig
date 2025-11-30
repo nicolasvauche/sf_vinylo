@@ -1,6 +1,6 @@
 {{ form_start(form, {'attr': {'class': 'app-form'}}) }}
 <fieldset class="form-fieldset">
-    <legend class="form-legend">Ajouter un disque</legend>
+    <legend class="form-legend">Nouveau disque</legend>
 
     <div class="form-group">
         <div class="group-widget">
@@ -26,6 +26,11 @@
 </fieldset>
 
 <fieldset class="form-fieldset controls">
-    <button type="submit" class="form-submit">Lancer la recherche</button>
+    <div class="app-grid third reverse">
+        <button type="button" class="form-button" title="Dicter votre disque">
+            {{ ux_icon('fa7-solid:microphone-alt', {'class': 'app-icon'}) }}
+        </button>
+        <button type="submit" class="form-submit">Lancer la recherche</button>
+    </div>
 </fieldset>
 {{ form_end(form) }}

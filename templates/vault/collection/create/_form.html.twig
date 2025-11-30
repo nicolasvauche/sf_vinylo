@@ -1,0 +1,104 @@
+{{ form_start(form, {'attr': {'class': 'app-form'}}) }}
+<fieldset class="form-fieldset">
+    <legend class="form-legend">Ajouter le disque</legend>
+
+    <div class="form-group">
+        <div class="group-widget">
+            {{ form_label(form.artistName) }}
+            {{ form_widget(form.artistName) }}
+        </div>
+        <div class="group-info">
+            {{ form_help(form.artistName) }}
+            {{ form_errors(form.artistName) }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="group-widget">
+            {{ form_label(form.recordTitle) }}
+            {{ form_widget(form.recordTitle) }}
+        </div>
+        <div class="group-info">
+            {{ form_help(form.recordTitle) }}
+            {{ form_errors(form.recordTitle) }}
+        </div>
+    </div>
+
+    <div class="app-grid two">
+        <div class="form-group">
+            <div class="group-widget">
+                {{ form_label(form.artistCountryName) }}
+                {{ form_widget(form.artistCountryName) }}
+            </div>
+            <div class="group-info">
+                {{ form_help(form.artistCountryName) }}
+                {{ form_errors(form.artistCountryName) }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="group-widget">
+                {{ form_label(form.recordYear) }}
+                {{ form_widget(form.recordYear) }}
+            </div>
+            <div class="group-info">
+                {{ form_help(form.recordYear) }}
+                {{ form_errors(form.recordYear) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group app-covers">
+        <div class="group-widget">
+            <label class="form-label">Covers</label>
+
+            <div class="app-grid two" data-controller="image--lazy-load">
+                {% for i in 1..6 %}
+                    <label class="app-cover">
+                        <input type="radio"
+                               name="{{ form.recordCoverChoice.vars.full_name }}"
+                               value="{{ 'cover-id-' ~ i }}"
+                               {% if form.recordCoverChoice.vars.value == 'cover-id-' ~ i %}checked{% endif %}>
+                        <img src="{{ asset('img/cover.jpg') }}" alt="Couverture {{ i }}"/>
+                    </label>
+                {% endfor %}
+            </div>
+
+            {{ form_widget(form.recordCoverChoice) }}
+            {{ form_errors(form.recordCoverChoice) }}
+        </div>
+    </div>
+
+    <div class="app-grid two">
+        <div class="form-group input-photo">
+            <div class="group-widget">
+                <label for="{{ form.recordCoverUpload.vars.id }}" class="app-upload-btn" title="Importer une photo">
+                    {{ ux_icon('fa7-solid:image', {'class': 'app-icon'}) }}
+                </label>
+                {{ form_widget(form.recordCoverUpload) }}
+            </div>
+            <div class="group-info">
+                {{ form_help(form.recordCoverUpload) }}
+                {{ form_errors(form.recordCoverUpload) }}
+            </div>
+        </div>
+
+        <div class="form-group input-photo">
+            <div class="group-widget">
+                <label for="{{ form.recordCoverCamera.vars.id }}" class="app-upload-btn" title="Prendre une photo">
+                    {{ ux_icon('fa7-solid:camera', {'class': 'app-icon'}) }}
+                </label>
+                {{ form_widget(form.recordCoverCamera) }}
+            </div>
+            <div class="group-info">
+                {{ form_help(form.recordCoverCamera) }}
+                {{ form_errors(form.recordCoverCamera) }}
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="form-fieldset controls">
+    <button type="submit" class="form-submit">Ajouter le disque</button>
+</fieldset>
+{{ form_end(form) }}

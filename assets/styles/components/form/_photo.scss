@@ -1,0 +1,36 @@
+&.input-photo {
+    margin-bottom: 0;
+
+    .group-widget {
+        @include displayFlex(center, center);
+        padding: 0;
+        border: 0;
+        border: none;
+
+        .app-upload-btn {
+            box-sizing: border-box;
+            @include displayFlex(center, center);
+            padding: 0.25rem 0.5rem;
+            width: fit-content;
+            font-family: $font-primary;
+            font-size: 1.25rem;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            color: $secondary;
+            background-color: $third;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 1px 1px 2px rgba($black, 0.5);
+            cursor: pointer;
+
+            &:active {
+                box-shadow: inset 1px 1px 2px rgba($black, 0.85);
+            }
+
+            .app-icon {
+                font-size: 2.5rem;
+            }
+        }
+    }
+}
