@@ -4,9 +4,13 @@ namespace App\Form\Vault\Collection;
 
 use App\Dto\Vault\Collection\EditEditionDto;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 
@@ -29,18 +33,15 @@ final class CreateType extends AbstractType
                     'class' => 'help',
                 ],
             ])
-            ->add('artistCountryName', TextType::class, [
+            ->add('artistCountryCode', CountryType::class, [
                 'required' => true,
                 'label' => 'Pays',
-                'label_attr' => [
-                    'class' => 'form-label',
-                ],
-                'attr' => [
-                    'class' => 'form-control',
-                ],
-                'help_attr' => [
-                    'class' => 'help',
-                ],
+                'label_attr' => ['class' => 'form-label'],
+                'attr' => ['class' => 'form-control'],
+                'help_attr' => ['class' => 'help'],
+                'placeholder' => '— Sélectionner —',
+                'preferred_choices' => ['FR', 'US', 'GB', 'DE', 'CA'],
+                'choice_translation_locale' => 'fr',
             ])
             ->add('recordTitle', TextType::class, [
                 'required' => true,
@@ -117,6 +118,38 @@ final class CreateType extends AbstractType
                     ),
                 ],
             ]);
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var EditEditionDto|null $dto */
+            $dto = $event->getData();
+            if (!$dto) {
+                return;
+            }
+            $code = $dto->artistCountryCode ?? null;
+            if ($code && $code !== 'XX') {
+                $dto->artistCountryName = Countries::exists($code)
+                    ? Countries::getName($code, 'fr')
+                    : $dto->artistCountryName;
+            } else {
+                $dto->artistCountryName = null;
+            }
+        });
+
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            /** @var EditEditionDto $dto */
+            $dto = $event->getData();
+            $code = $dto->artistCountryCode ?? null;
+
+            if ($code && $code !== 'XX') {
+                $dto->artistCountryName = Countries::exists($code)
+                    ? Countries::getName($code, 'fr')
+                    : null;
+            } else {
+                $dto->artistCountryName = null;
+            }
+
+            $event->setData($dto);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

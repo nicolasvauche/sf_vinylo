@@ -6,8 +6,14 @@
 parameters:
     app.locale: 'fr'
     app.localestr: 'fr_FR'
-    app.timezone: '%env(APP_TIMEZONE)%'
     app.uploads_directory: '%kernel.project_dir%/public/uploads'
+    app.timezone: '%env(string:APP_TIMEZONE)%'
+    discogs.base_uri: '%env(string:DISCOGS_URL)%'
+    discogs.user_agent: '%env(string:DISCOGS_USER_AGENT)%'
+    discogs.token: '%env(string:DISCOGS_TOKEN)%'
+    ai.base_uri: '%env(string:AI_URL)%'
+    ai.token: '%env(string:AI_TOKEN)%'
+    ai.model: '%env(string:AI_MODEL)%'
 
 services:
     # default configuration for services in *this* file
@@ -20,13 +26,46 @@ services:
     App\:
         resource: '../src/'
 
-#    App\Service\Discogs\DiscogsClient:
-#        arguments:
-#            $userAgent: '%env(string:DISCOGS_USER_AGENT)%'
-#            $baseUrl: '%env(string:DISCOGS_URL)%'
-#            $token: '%env(string:DISCOGS_TOKEN)%'
-#            $timeout: 2.5
-#            $cache: '@cache.app'
-#            $logger: '@monolog.logger.discogs'
-#            $debug: true
-#            $bypassCache: true
+    # Monolog Aliases
+    monolog.logger.discogs:
+        class: Psr\Log\LoggerInterface
+        factory: [ '@monolog.logger', 'get' ]
+        arguments: [ 'discogs' ]
+
+    monolog.logger.ai:
+        class: Psr\Log\LoggerInterface
+        factory: [ '@monolog.logger', 'get' ]
+        arguments: [ 'ai' ]
+
+    # Http Clients
+    http_client.discogs:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: [ '@http_client', 'withOptions' ]
+        arguments:
+            - { base_uri: '%discogs.base_uri%', timeout: 10.0 }
+
+    http_client.ai:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: [ '@http_client', 'withOptions' ]
+        arguments:
+            - { base_uri: '%ai.base_uri%', timeout: 20.0 }
+
+    # Discogs Clients
+    App\Service\Discogs\AddRecord\DiscogsHttpClient:
+        arguments:
+            $discogsClient: '@http_client.discogs'
+            $userAgent: '%discogs.user_agent%'
+            $token: '%discogs.token%'
+            $discogsLogger: '@monolog.logger.discogs'
+
+    App\Service\Discogs\AddRecord\DiscogsClientInterface: '@App\Service\Discogs\AddRecord\DiscogsHttpClient'
+
+    # IA Client
+    App\Service\Ai\AddRecord\AiHttpClient:
+        arguments:
+            $openaiClient: '@http_client.ai'
+            $token: '%ai.token%'
+            $model: '%ai.model%'
+            $aiLogger: '@monolog.logger.ai'
+
+    App\Service\Ai\AddRecord\AiClientInterface: '@App\Service\Ai\AddRecord\AiHttpClient'

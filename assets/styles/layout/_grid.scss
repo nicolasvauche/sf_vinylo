@@ -6,6 +6,8 @@
     }
 
     &.third {
+        @include displayGrid(1fr 6rem, 1rem);
+
         &.reverse {
             @include displayGrid(4rem 1fr, 1rem);
         }

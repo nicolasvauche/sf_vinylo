@@ -2,16 +2,19 @@
     margin-bottom: 0.5rem;
 
     .app-grid {
-        overflow-y: auto;
         gap: 0.5rem;
         margin-top: 0.5rem;
-        padding: 0 0.75rem 0 0.5rem;
-        max-height: 24dvh;
+        padding: 0 0.5rem 0 0.5rem;
+
+        &.covers {
+            overflow-y: auto;
+            max-height: 22dvh;
+        }
     }
 
     .app-cover {
         position: relative;
-        height: 15dvh;
+        height: 13dvh;
 
         input[type="radio"] {
             position: absolute;

@@ -3,7 +3,8 @@
 
     .group-widget {
         @include displayFlex(center, center);
-        padding: 0;
+        padding: 0 0 0.25rem;
+        height: 100%;
         border: 0;
         border: none;
 
@@ -11,7 +12,8 @@
             box-sizing: border-box;
             @include displayFlex(center, center);
             padding: 0.25rem 0.5rem;
-            width: fit-content;
+            width: 100%;
+            height: 100%;
             font-family: $font-primary;
             font-size: 1.25rem;
             font-weight: bold;
@@ -29,7 +31,7 @@
             }
 
             .app-icon {
-                font-size: 2.5rem;
+                font-size: 4rem;
             }
         }
     }

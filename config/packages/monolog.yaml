@@ -2,6 +2,7 @@ monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
         - discogs
+        - ai
 
 when@dev:
     monolog:
@@ -18,8 +19,14 @@ when@dev:
             discogs:
                 type: stream
                 path: '%kernel.project_dir%/var/log/discogs.log'
-                level: debug
+                level: info
                 channels: [ 'discogs' ]
+                formatter: monolog.formatter.line
+            ai:
+                type: stream
+                path: '%kernel.project_dir%/var/log/ai.log'
+                level: info
+                channels: [ 'ai' ]
                 formatter: monolog.formatter.line
 
 when@test:

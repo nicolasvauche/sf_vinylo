@@ -4,8 +4,13 @@ namespace App\Controller\Vault\Collection;
 
 use App\Dto\Vault\Collection\AddEditionDto;
 use App\Dto\Vault\Collection\EditEditionDto;
+use App\Entity\User\User;
 use App\Form\Vault\Collection\AddType;
 use App\Form\Vault\Collection\CreateType;
+use App\Repository\Vault\Draft\EditionDraftRepository;
+use App\Service\Vault\AddRecord\CheckDuplicateService;
+use App\Service\Vault\AddRecord\CreateOrRetrieveDraftService;
+use App\Service\Vault\AddRecord\FinalizeAddEditionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,17 +19,21 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AddController extends AbstractController
 {
     #[Route('/vault/collection/ajouter', name: 'app_vault_collection_add_form')]
-    public function addRecord(Request $request): Response
-    {
+    public function addRecord(
+        Request $request,
+        CreateOrRetrieveDraftService $starter
+    ): Response {
         $data = new AddEditionDto();
-
-        $form = $this->createForm(AddType::class, $data)
-            ->handleRequest($request);
+        $form = $this->createForm(AddType::class, $data)->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->addFlash('success', 'Vous pouvez maintenant personnaliser votre édition');
+            /** @var User $user */
+            $user = $this->getUser();
+            $draft = $starter->start($user, $data->artistName, $data->recordTitle);
 
-            return $this->redirectToRoute('app_vault_collection_add_form_validate', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_vault_collection_add_form_validate', [
+                'id' => $draft->getId(),
+            ], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('vault/collection/add/index.html.twig', [
@@ -32,15 +41,95 @@ final class AddController extends AbstractController
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200));
     }
 
-    #[Route('/vault/collection/ajouter/valider', name: 'app_vault_collection_add_form_validate')]
-    public function validateRecord(Request $request): Response
-    {
+    #[Route(
+        '/vault/collection/ajouter/{id<\d+>}/valider',
+        name: 'app_vault_collection_add_form_validate',
+        methods: [
+            'GET',
+            'POST',
+        ])]
+    public function validateRecord(
+        int $id,
+        Request $request,
+        EditionDraftRepository $draftRepo,
+        CheckDuplicateService $dup,
+        FinalizeAddEditionService $finalize,
+    ): Response {
+        $draft = $draftRepo->find($id);
+        if (!$draft) {
+            throw $this->createNotFoundException();
+        }
+        if ($draft->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $resolved = $draft->getResolved() ?? [];
+        $needsConfirmDuplicate = $dup->existsDuplicateForDraft($draft);
+
         $data = new EditEditionDto();
+        $data->artistName = (string)($resolved['artist']['name'] ?? '');
+        $data->artistCountryCode = (string)($resolved['artist']['countryCode'] ?? 'XX');
+        $data->artistCountryName = $data->artistCountryCode === 'XX' ? null : (string)($resolved['artist']['countryName'] ?? null);
+        $data->recordTitle = (string)($resolved['record']['title'] ?? '');
+        $data->recordYear = (string)($resolved['record']['yearOriginal'] ?? '0000');
+        $data->discogsMasterId = $resolved['record']['discogsMasterId'] ?? null;
+        $data->discogsReleaseId = $resolved['record']['discogsReleaseId'] ?? null;
+        $data->recordCoverChoice = 'discogs';
+        $data->covers = $resolved['covers'] ?? [];
+        $data->coverDefaultIndex = (int)($resolved['coverDefaultIndex'] ?? 0);
 
         $form = $this->createForm(CreateType::class, $data)
             ->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var User $user */
+            $user = $this->getUser();
+
+            // Récup des fichiers (non mappés)
+            $uploadFile = $form->get('recordCoverUpload')->getData();
+            $cameraFile = $form->get('recordCoverCamera')->getData();
+
+            $choice = $data->recordCoverChoice ?? 'discogs';
+
+            // Convention:
+            // - "upload" => on prend recordCoverUpload
+            // - "camera" => on prend recordCoverCamera
+            // - numérique => index dans $data->covers
+            // - "discogs" (par défaut) => on garde coverDefaultIndex
+
+            if ($choice === 'upload' && $uploadFile) {
+                $targetDir = $this->getParameter('kernel.project_dir').'/public/uploads/covers';
+                @mkdir($targetDir, 0775, true);
+
+                $ext = $uploadFile->guessExtension() ?: 'jpg';
+                $filename = sprintf('cover_%s.%s', bin2hex(random_bytes(8)), $ext);
+                $uploadFile->move($targetDir, $filename);
+
+                $publicUrl = '/uploads/covers/'.$filename;
+
+                $data->covers = [['url' => $publicUrl, 'source' => 'upload']];
+                $data->coverDefaultIndex = 0;
+            } elseif ($choice === 'camera' && $cameraFile) {
+                $targetDir = $this->getParameter('app.uploads_directory').'/covers';
+                @mkdir($targetDir, 0775, true);
+
+                $ext = $cameraFile->guessExtension() ?: 'jpg';
+                $filename = sprintf('cover_%s.%s', bin2hex(random_bytes(8)), $ext);
+                $cameraFile->move($targetDir, $filename);
+
+                $publicUrl = '/uploads/covers/'.$filename;
+
+                $data->covers = [['url' => $publicUrl, 'source' => 'camera']];
+                $data->coverDefaultIndex = 0;
+            } elseif (ctype_digit((string)$choice)) {
+                $idx = (int)$choice;
+                if (isset($data->covers[$idx])) {
+                    $data->coverDefaultIndex = $idx;
+                }
+            }
+
+            $editionId = $finalize->finalize($draft, $data, $user);
+
             $this->addFlash('success', 'Le disque a été ajouté à votre collection');
 
             return $this->redirectToRoute('app_vault_collection_add_form', [], Response::HTTP_SEE_OTHER);
@@ -48,6 +137,8 @@ final class AddController extends AbstractController
 
         return $this->render('vault/collection/validate/index.html.twig', [
             'form' => $form->createView(),
+            'draft' => $draft,
+            'needsConfirmDuplicate' => $needsConfirmDuplicate,
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200));
     }
 }
