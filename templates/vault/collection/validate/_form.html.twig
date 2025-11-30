@@ -58,7 +58,7 @@
                         <input type="radio"
                                name="{{ form.recordCoverChoice.vars.full_name }}"
                                value="{{ 'cover-id-' ~ i }}"
-                               {% if form.recordCoverChoice.vars.value == 'cover-id-' ~ i %}checked{% endif %}>
+                               {% if i == 1 %}checked{% endif %}>
                         <img src="{{ asset('img/cover.jpg') }}" alt="Couverture {{ i }}"/>
                     </label>
                 {% endfor %}

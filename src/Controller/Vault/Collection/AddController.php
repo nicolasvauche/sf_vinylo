@@ -46,7 +46,7 @@ final class AddController extends AbstractController
             return $this->redirectToRoute('app_vault_collection_add_form', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('vault/collection/create/index.html.twig', [
+        return $this->render('vault/collection/validate/index.html.twig', [
             'form' => $form->createView(),
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200));
     }
