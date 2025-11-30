@@ -8,17 +8,20 @@ html {
     }
 
     .turbo-progress-bar {
-        position: fixed;
-        top: 0;
-        left: max(0px, (100vw - $displayMaxWidth) / 2);
-        right: max(0px, (100vw - $displayMaxWidth) / 2);
-        width: calc(100vw - 2 * max(0px, (100vw - $displayMaxWidth) / 2));
-        max-width: $displayMaxWidth;
         height: 0.5rem;
-        z-index: 10001;
         background-color: $secondary;
         border-bottom-right-radius: 0.25rem;
-        transform-origin: left center !important;
+
+        @include respondTo(md) {
+            position: fixed;
+            top: 0;
+            left: max(0px, (100vw - $displayMaxWidth) / 2);
+            right: max(0px, (100vw - $displayMaxWidth) / 2);
+            z-index: 10001;
+            width: calc(100vw - 2 * max(0px, (100vw - $displayMaxWidth) / 2));
+            max-width: $displayMaxWidth;
+            transform-origin: left center !important;
+        }
     }
 
     body {
