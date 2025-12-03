@@ -4,7 +4,7 @@ namespace App\Dto\Vault\Collection;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EditEditionDto
+final class ValidateEditionDto
 {
     #[Assert\NotBlank]
     public ?string $artistName = null;
@@ -20,6 +20,9 @@ final class EditEditionDto
 
     #[Assert\NotBlank]
     public ?string $recordTitle = null;
+
+    #[Assert\Choice(['33T', '45T', 'Maxi45T', '78T', 'Mixte', 'Inconnu'])]
+    public ?string $recordFormat = null;
 
     #[Assert\NotBlank]
     #[Assert\Regex(pattern: '/^(0000|\d{4})$/')]

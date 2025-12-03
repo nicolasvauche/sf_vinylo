@@ -11,6 +11,9 @@ use Psr\Log\LoggerInterface;
 
 final readonly class AddRecordResolver
 {
+    /** @var string[] */
+    private const ALLOWED_FORMATS = ['33T', '45T', 'Maxi45T', '78T', 'Mixte', 'Inconnu'];
+
     public function __construct(
         private DiscogsClientInterface $discogs,
         private AiClientInterface $ai,
@@ -26,7 +29,11 @@ final readonly class AddRecordResolver
         $a = $draft->getArtistCanonical();
         $r = $draft->getRecordCanonical();
 
-        $this->discogsLogger->info('discogs.request', ['draftId' => $draft->getId(), 'artist' => $a, 'record' => $r]);
+        $this->discogsLogger->info('discogs.request', [
+            'draftId' => $draft->getId(),
+            'artist' => $a,
+            'record' => $r,
+        ]);
 
         $result = $this->discogs->search($a, $r);
 
@@ -53,15 +60,24 @@ final readonly class AddRecordResolver
             'artistCanonical' => $draft->getArtistCanonical(),
             'recordCanonical' => $draft->getRecordCanonical(),
         ];
+
         $candidates = $discogs['candidates'] ?? [];
 
-        $this->aiLogger->info('ai.request', ['draftId' => $draft->getId(), 'candidates_count' => count($candidates)]);
+        $this->aiLogger->info('ai.request', [
+            'draftId' => $draft->getId(),
+            'candidates_count' => count($candidates),
+            'payload' => ['input' => $input],
+        ]);
+
         $out = $this->ai->enrich($input, $candidates);
+
         $this->aiLogger->info('ai.response', [
             'draftId' => $draft->getId(),
             'artist.displayName' => $out['artist']['displayName'] ?? null,
+            'artist.countryCode' => $out['artist']['countryCode'] ?? null,
             'record.displayTitle' => $out['record']['displayTitle'] ?? null,
-            'yearOriginal' => $out['record']['yearOriginal'] ?? null,
+            'record.yearOriginal' => $out['record']['yearOriginal'] ?? null,
+            'record.format' => $out['record']['format'] ?? null,
         ]);
 
         return $out + ['error' => null];
@@ -70,54 +86,82 @@ final readonly class AddRecordResolver
     public function buildResolved(EditionDraft $draft, array $discogs, array $ai): array
     {
         $chosen = $discogs['chosen'] ?? null;
+        $candidates = $discogs['candidates'] ?? [];
+
         $candidate = null;
+
         if ($chosen) {
-            foreach ($discogs['candidates'] ?? [] as $c) {
-                if (($chosen['type'] ?? null) === 'master' && ($c['masterId'] ?? null) === ($chosen['id'] ?? null)) {
-                    $candidate = $c;
-                    break;
-                }
-                if (($chosen['type'] ?? null) === 'release' && ($c['releaseId'] ?? null) === ($chosen['id'] ?? null)) {
+            foreach ($candidates as $c) {
+                if (
+                    ($chosen['type'] === 'master' && ($c['masterId'] ?? null) === ($chosen['id'] ?? null)) ||
+                    ($chosen['type'] === 'release' && ($c['releaseId'] ?? null) === ($chosen['id'] ?? null))
+                ) {
                     $candidate = $c;
                     break;
                 }
             }
         }
-        $candidate ??= ($discogs['candidates'][0] ?? null);
+        $candidate ??= ($candidates[0] ?? []);
 
-        // Artist
-        $artistDisplay = $ai['artist']['displayName'] ?? ($candidate['artistName'] ?? $draft->getInput(
-        )['artistRaw'] ?? '');
+        // -------------------------
+        // ARTIST
+        // -------------------------
+        $artistDisplay = $ai['artist']['displayName']
+            ?? $candidate['artistName']
+            ?? ($draft->getInput()['artistRaw'] ?? '');
+
         $artistName = $this->titleCaser->titleCase((string)$artistDisplay);
         $artistCanonical = $this->canonicalizer->canonicalize($artistName);
 
         $cc = $ai['artist']['countryCode'] ?? 'XX';
-        $cc = (is_string($cc) && preg_match('/^[A-Z]{2}$/', $cc)) ? $cc : 'XX';
+        $cc = preg_match('/^[A-Z]{2}$/', (string)$cc) ? (string)$cc : 'XX';
+
         $cn = ($cc === 'XX') ? null : ($ai['artist']['countryName'] ?? null);
+
         $discogsArtistId = $candidate['artistId'] ?? null;
 
-        // Record
-        $recordDisplay = $ai['record']['displayTitle'] ?? ($candidate['recordTitle'] ?? $draft->getInput(
-        )['recordRaw'] ?? '');
+        // -------------------------
+        // RECORD
+        // -------------------------
+        $recordDisplay = $ai['record']['displayTitle']
+            ?? $candidate['recordTitle']
+            ?? ($draft->getInput()['recordRaw'] ?? '');
+
         $recordTitle = $this->titleCaser->titleCase((string)$recordDisplay);
         $recordCanonical = $this->canonicalizer->canonicalize($recordTitle);
 
-        // Year
+        // YEAR (AI → candidate → 0000)
         $yearAi = $ai['record']['yearOriginal'] ?? null;
         $year = $this->normalizeYear($yearAi);
+
         if ($year === null) {
             $years = $candidate['years'] ?? [];
             sort($years);
             $year = $this->normalizeYear($years[0] ?? null) ?? '0000';
         }
 
-        // Discogs IDs
+        // IDs
         $discogsMasterId = $candidate['masterId'] ?? null;
         $discogsReleaseId = $candidate['releaseId'] ?? null;
 
-        // Covers (≤10), coverDefault
+        // -------------------------
+        // FORMAT (IA)
+        // -------------------------
+        $aiFormatRaw = $ai['record']['format'] ?? null;
+        $format = $this->normalizeAiFormat($aiFormatRaw);
+
+        $this->aiLogger->info('ai.record.format.normalized', [
+            'draftId' => $draft->getId(),
+            'format_raw' => $aiFormatRaw,
+            'format_final' => $format,
+        ]);
+
+        // -------------------------
+        // COVERS
+        // -------------------------
         $covers = array_slice($candidate['covers'] ?? [], 0, 10);
         $defaultIndex = 0;
+
         foreach ($covers as $i => $c) {
             if (($c['source'] ?? null) === 'master') {
                 $defaultIndex = $i;
@@ -139,6 +183,7 @@ final readonly class AddRecordResolver
                 'yearOriginal' => $year,
                 'discogsMasterId' => $discogsMasterId,
                 'discogsReleaseId' => $discogsReleaseId,
+                'format' => $format,     // <-- ajouté
             ],
             'covers' => $covers,
             'coverDefaultIndex' => empty($covers) ? 0 : $defaultIndex,
@@ -156,10 +201,38 @@ final readonly class AddRecordResolver
         }
         $i = (int)$y;
         $max = (int)(new \DateTimeImmutable())->format('Y') + 1;
-        if ($i < 1900 || $i > $max) {
-            return null;
+
+        return ($i >= 1900 && $i <= $max) ? $y : null;
+    }
+
+    private function normalizeAiFormat(mixed $fmt): string
+    {
+        if (!is_string($fmt) || $fmt === '') {
+            return 'Inconnu';
+        }
+        $fmt = trim($fmt);
+
+        if (in_array($fmt, self::ALLOWED_FORMATS, true)) {
+            return $fmt;
         }
 
-        return $y;
+        $l = mb_strtolower($fmt, 'UTF-8');
+        if ($l === '33' || $l === '33t' || str_contains($l, 'lp')) {
+            return '33T';
+        }
+        if ($l === '45' || $l === '45t' || str_contains($l, '7"')) {
+            return '45T';
+        }
+        if (str_contains($l, '12"') || str_contains($l, 'maxi')) {
+            return 'Maxi45T';
+        }
+        if (str_contains($l, '78')) {
+            return '78T';
+        }
+        if (str_contains($l, 'mix')) {
+            return 'Mixte';
+        }
+
+        return 'Inconnu';
     }
 }

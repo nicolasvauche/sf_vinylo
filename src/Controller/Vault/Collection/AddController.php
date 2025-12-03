@@ -3,14 +3,14 @@
 namespace App\Controller\Vault\Collection;
 
 use App\Dto\Vault\Collection\AddEditionDto;
-use App\Dto\Vault\Collection\EditEditionDto;
 use App\Entity\User\User;
 use App\Form\Vault\Collection\AddType;
-use App\Form\Vault\Collection\CreateType;
+use App\Form\Vault\Collection\ValidateType;
 use App\Repository\Vault\Draft\EditionDraftRepository;
 use App\Service\Vault\AddRecord\CheckDuplicateService;
 use App\Service\Vault\AddRecord\CreateOrRetrieveDraftService;
 use App\Service\Vault\AddRecord\FinalizeAddEditionService;
+use App\Service\Vault\AddRecord\ValidateRecordService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,15 +44,14 @@ final class AddController extends AbstractController
     #[Route(
         '/vault/collection/ajouter/{id<\d+>}/valider',
         name: 'app_vault_collection_add_form_validate',
-        methods: [
-            'GET',
-            'POST',
-        ])]
+        methods: ['GET', 'POST']
+    )]
     public function validateRecord(
         int $id,
         Request $request,
         EditionDraftRepository $draftRepo,
         CheckDuplicateService $dup,
+        ValidateRecordService $validatorSvc,
         FinalizeAddEditionService $finalize,
     ): Response {
         $draft = $draftRepo->find($id);
@@ -63,70 +62,19 @@ final class AddController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $resolved = $draft->getResolved() ?? [];
         $needsConfirmDuplicate = $dup->existsDuplicateForDraft($draft);
 
-        $data = new EditEditionDto();
-        $data->artistName = (string)($resolved['artist']['name'] ?? '');
-        $data->artistCountryCode = (string)($resolved['artist']['countryCode'] ?? 'XX');
-        $data->artistCountryName = $data->artistCountryCode === 'XX' ? null : (string)($resolved['artist']['countryName'] ?? null);
-        $data->recordTitle = (string)($resolved['record']['title'] ?? '');
-        $data->recordYear = (string)($resolved['record']['yearOriginal'] ?? '0000');
-        $data->discogsMasterId = $resolved['record']['discogsMasterId'] ?? null;
-        $data->discogsReleaseId = $resolved['record']['discogsReleaseId'] ?? null;
-        $data->recordCoverChoice = 'discogs';
-        $data->covers = $resolved['covers'] ?? [];
-        $data->coverDefaultIndex = (int)($resolved['coverDefaultIndex'] ?? 0);
+        $data = $validatorSvc->createDtoFromDraft($draft);
 
-        $form = $this->createForm(CreateType::class, $data)
-            ->handleRequest($request);
+        $form = $this->createForm(ValidateType::class, $data)->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User $user */
             $user = $this->getUser();
 
-            // Récup des fichiers (non mappés)
-            $uploadFile = $form->get('recordCoverUpload')->getData();
-            $cameraFile = $form->get('recordCoverCamera')->getData();
+            $validatorSvc->handleCoverChoice($data, $form);
 
-            $choice = $data->recordCoverChoice ?? 'discogs';
-
-            // Convention:
-            // - "upload" => on prend recordCoverUpload
-            // - "camera" => on prend recordCoverCamera
-            // - numérique => index dans $data->covers
-            // - "discogs" (par défaut) => on garde coverDefaultIndex
-
-            if ($choice === 'upload' && $uploadFile) {
-                $targetDir = $this->getParameter('kernel.project_dir').'/public/uploads/covers';
-                @mkdir($targetDir, 0775, true);
-
-                $ext = $uploadFile->guessExtension() ?: 'jpg';
-                $filename = sprintf('cover_%s.%s', bin2hex(random_bytes(8)), $ext);
-                $uploadFile->move($targetDir, $filename);
-
-                $publicUrl = '/uploads/covers/'.$filename;
-
-                $data->covers = [['url' => $publicUrl, 'source' => 'upload']];
-                $data->coverDefaultIndex = 0;
-            } elseif ($choice === 'camera' && $cameraFile) {
-                $targetDir = $this->getParameter('app.uploads_directory').'/covers';
-                @mkdir($targetDir, 0775, true);
-
-                $ext = $cameraFile->guessExtension() ?: 'jpg';
-                $filename = sprintf('cover_%s.%s', bin2hex(random_bytes(8)), $ext);
-                $cameraFile->move($targetDir, $filename);
-
-                $publicUrl = '/uploads/covers/'.$filename;
-
-                $data->covers = [['url' => $publicUrl, 'source' => 'camera']];
-                $data->coverDefaultIndex = 0;
-            } elseif (ctype_digit((string)$choice)) {
-                $idx = (int)$choice;
-                if (isset($data->covers[$idx])) {
-                    $data->coverDefaultIndex = $idx;
-                }
-            }
+            $validatorSvc->backfillFormatFromResolved($data, $draft);
 
             $editionId = $finalize->finalize($draft, $data, $user);
 

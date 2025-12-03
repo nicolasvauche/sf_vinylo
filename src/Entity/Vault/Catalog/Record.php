@@ -4,6 +4,7 @@ namespace App\Entity\Vault\Catalog;
 
 use App\Entity\Vault\Collection\Edition;
 use App\Repository\Vault\Catalog\RecordRepository;
+use App\ValueObject\Vault\RecordFormat;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -27,6 +28,9 @@ class Record
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['titleCanonical'])]
     private ?string $slug = null;
+
+    #[ORM\Column(length: 255, options: ['default' => 'Inconnu'])]
+    private string $format = RecordFormat::UNKNOWN->value;
 
     #[ORM\Column(length: 255)]
     private ?string $yearOriginal = null;
@@ -96,6 +100,18 @@ class Record
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getFormat(): RecordFormat
+    {
+        return RecordFormat::from($this->format);
+    }
+
+    public function setFormat(RecordFormat $format): static
+    {
+        $this->format = $format->value;
 
         return $this;
     }

@@ -5,6 +5,7 @@ namespace App\Entity\Vault\Collection;
 use App\Entity\User\User;
 use App\Entity\Vault\Catalog\Record;
 use App\Repository\Vault\Collection\EditionRepository;
+use App\ValueObject\Vault\RecordFormat;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -15,6 +16,9 @@ class Edition
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column(length: 16, nullable: true)]
+    private ?string $format = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverFile = null;
@@ -38,6 +42,18 @@ class Edition
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getFormat(): ?RecordFormat
+    {
+        return $this->format ? RecordFormat::from($this->format) : null;
+    }
+
+    public function setFormat(?RecordFormat $format): static
+    {
+        $this->format = $format?->value;
+
+        return $this;
     }
 
     public function getCoverFile(): ?string

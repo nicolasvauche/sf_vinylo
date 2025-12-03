@@ -1,15 +1,28 @@
 {{ form_start(form, {'attr': {'class': 'app-form'}}) }}
 <fieldset class="form-fieldset">
-    <legend class="form-legend">Ajouter le disque</legend>
+    <legend class="form-legend">Ajouter à votre collection</legend>
 
-    <div class="form-group">
-        <div class="group-widget">
-            {{ form_label(form.artistName) }}
-            {{ form_widget(form.artistName) }}
+    <div class="app-grid third">
+        <div class="form-group">
+            <div class="group-widget">
+                {{ form_label(form.artistName) }}
+                {{ form_widget(form.artistName) }}
+            </div>
+            <div class="group-info">
+                {{ form_help(form.artistName) }}
+                {{ form_errors(form.artistName) }}
+            </div>
         </div>
-        <div class="group-info">
-            {{ form_help(form.artistName) }}
-            {{ form_errors(form.artistName) }}
+
+        <div class="form-group">
+            <div class="group-widget">
+                {{ form_label(form.recordFormat) }}
+                {{ form_widget(form.recordFormat) }}
+            </div>
+            <div class="group-info">
+                {{ form_help(form.recordFormat) }}
+                {{ form_errors(form.recordFormat) }}
+            </div>
         </div>
     </div>
 
@@ -24,7 +37,7 @@
         </div>
     </div>
 
-    <div class="app-grid third">
+    <div class="app-grid third alt">
         <div class="form-group">
             <div class="group-widget">
                 {{ form_label(form.artistCountryCode) }}
@@ -49,20 +62,24 @@
     </div>
 
     <div class="form-group app-covers">
-        <div class="group-widget">
+        <div class="group-widget"
+             data-controller="record--covers"
+             data-record--covers-name-value="{{ form.recordCoverChoice.vars.full_name }}"
+        >
             <label class="form-label">Covers</label>
 
             {% set covers = form.vars.data.covers ?? [] %}
             {% set defaultIndex = form.vars.data.coverDefaultIndex ?? 0 %}
 
-            <div class="app-grid two covers" data-controller="image--lazy-load">
+            <div class="app-grid two covers" data-record--covers-target="grid">
                 {% for idx, c in covers %}
                     <label class="app-cover">
                         <input type="radio"
                                name="{{ form.recordCoverChoice.vars.full_name }}"
                                value="{{ idx }}"
-                               {% if idx == defaultIndex %}checked{% endif %}>
-                        <img src="{{ c.url }}" alt="Couverture {{ idx + 1 }}">
+                               {% if idx == defaultIndex %}checked{% endif %}
+                               data-action="change->record--covers#onDiscogsRadio">
+                        <img src="{{ c.url }}" alt="Couverture {{ idx + 1 }}" loading="lazy" decoding="async">
                     </label>
                 {% else %}
                     <p class="help">Aucune image disponible depuis Discogs.</p>
@@ -70,12 +87,12 @@
             </div>
 
             <div class="app-grid two">
-                <div class="form-group app-cover input-photo">
+                <div class="form-group input-photo">
                     <div class="group-widget">
                         <label for="{{ form.recordCoverUpload.vars.id }}" class="app-upload-btn" title="Importer une photo">
                             {{ ux_icon('fa7-solid:image', {'class': 'app-icon'}) }}
                         </label>
-                        {{ form_widget(form.recordCoverUpload) }}
+                        {{ form_widget(form.recordCoverUpload, { attr: { 'data-action': 'change->record--covers#onUpload' } }) }}
                     </div>
                     <div class="group-info">
                         {{ form_help(form.recordCoverUpload) }}
@@ -83,12 +100,12 @@
                     </div>
                 </div>
 
-                <div class="form-group app-cover input-photo">
+                <div class="form-group input-photo">
                     <div class="group-widget">
                         <label for="{{ form.recordCoverCamera.vars.id }}" class="app-upload-btn" title="Prendre une photo">
                             {{ ux_icon('fa7-solid:camera', {'class': 'app-icon'}) }}
                         </label>
-                        {{ form_widget(form.recordCoverCamera) }}
+                        {{ form_widget(form.recordCoverCamera, { attr: { 'data-action': 'change->record--covers#onCamera' } }) }}
                     </div>
                     <div class="group-info">
                         {{ form_help(form.recordCoverCamera) }}

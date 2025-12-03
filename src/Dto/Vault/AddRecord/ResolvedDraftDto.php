@@ -17,7 +17,8 @@ final class ResolvedDraftDto
         public ?string $discogsReleaseId,
         /** @var array<int,array{url:string,width?:int,height?:int,source?:string}> */
         public array $covers,
-        public int $coverDefaultIndex
+        public int $coverDefaultIndex,
+        public ?string $format = null,
     ) {
     }
 }

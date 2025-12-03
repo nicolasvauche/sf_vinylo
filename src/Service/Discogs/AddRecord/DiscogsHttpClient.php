@@ -34,23 +34,32 @@ final readonly class DiscogsHttpClient implements DiscogsClientInterface
         ]);
 
         $candidates = [];
-        $topMasterId = null;
-        $topReleaseId = null;
+        $masterIds = [];
+        $releaseIds = [];
 
+        // Map masters
         foreach (($masters['results'] ?? []) as $m) {
-            $topMasterId ??= (string)($m['id'] ?? '');
+            $id = (string)($m['id'] ?? '');
+            if ($id !== '') {
+                $masterIds[] = $id;
+            }
             $candidates[] = $this->mapSearchResult($m, 'master');
         }
+
+        // Map releases
         foreach (($releases['results'] ?? []) as $r) {
-            $topReleaseId ??= (string)($r['id'] ?? '');
+            $id = (string)($r['id'] ?? '');
+            if ($id !== '') {
+                $releaseIds[] = $id;
+            }
             $candidates[] = $this->mapSearchResult($r, 'release');
         }
 
-        if ($topMasterId) {
-            $this->enrichImages($candidates, 'master', $topMasterId);
+        foreach (array_slice($masterIds, 0, 3) as $mid) {
+            $this->enrichFromDetail($candidates, 'master', $mid);
         }
-        if ($topReleaseId) {
-            $this->enrichImages($candidates, 'release', $topReleaseId);
+        foreach (array_slice($releaseIds, 0, 5) as $rid) {
+            $this->enrichFromDetail($candidates, 'release', $rid);
         }
 
         foreach ($candidates as &$c) {
@@ -61,8 +70,8 @@ final readonly class DiscogsHttpClient implements DiscogsClientInterface
 
         $this->discogsLogger->info('discogs.search.done', [
             'candidates' => count($candidates),
-            'hasMaster' => (bool)$topMasterId,
-            'hasRelease' => (bool)$topReleaseId,
+            'masters' => count($masterIds),
+            'releases' => count($releaseIds),
         ]);
 
         return new DiscogsSearchResult($candidates, null);
@@ -85,12 +94,13 @@ final readonly class DiscogsHttpClient implements DiscogsClientInterface
     {
         $artistName = (string)($r['artist'] ?? ($r['title'] ?? ''));
         $title = (string)($r['title'] ?? '');
+
         if (str_contains($title, ' - ')) {
             [$an, $tt] = explode(' - ', $title, 2);
-            if (!empty($an)) {
+            if ($an !== '') {
                 $artistName = $an;
             }
-            if (!empty($tt)) {
+            if ($tt !== '') {
                 $title = $tt;
             }
         }
@@ -112,10 +122,11 @@ final readonly class DiscogsHttpClient implements DiscogsClientInterface
         ];
     }
 
-    private function enrichImages(array &$candidates, string $type, string $id): void
+    private function enrichFromDetail(array &$candidates, string $type, string $id): void
     {
         $detail = $this->getJson($type === 'master' ? "/masters/$id" : "/releases/$id");
 
+        // IMAGES
         $imgs = [];
         foreach (($detail['images'] ?? []) as $img) {
             if (!empty($img['uri'])) {
@@ -128,44 +139,74 @@ final readonly class DiscogsHttpClient implements DiscogsClientInterface
             }
         }
 
+        // YEARS
         $years = [];
-        if ($type === 'master') {
-            if (!empty($detail['year'])) {
-                $years[] = (int)$detail['year'];
-            }
-        } else {
-            if (!empty($detail['year'])) {
-                $years[] = (int)$detail['year'];
-            }
-            if (!empty($detail['released'])) {
-                $y = substr((string)$detail['released'], 0, 4);
-                if (ctype_digit($y)) {
-                    $years[] = (int)$y;
-                }
+        if (!empty($detail['year'])) {
+            $years[] = (int)$detail['year'];
+        }
+        if ($type === 'release' && !empty($detail['released'])) {
+            $y = substr((string)$detail['released'], 0, 4);
+            if (ctype_digit($y)) {
+                $years[] = (int)$y;
             }
         }
 
+        // COUNTRY (release only)
         $releaseCountry = null;
         if ($type === 'release' && !empty($detail['country']) && is_string($detail['country'])) {
             $releaseCountry = $detail['country'];
         }
 
+        // ARTIST ID
+        $artistIdFromDetail = $this->extractArtistId($detail);
+
         foreach ($candidates as &$c) {
-            if (($type === 'master' && ($c['masterId'] ?? null) === $id)
-                || ($type === 'release' && ($c['releaseId'] ?? null) === $id)) {
-                if (!empty($imgs)) {
-                    $c['covers'] = $imgs;
+            $isTarget =
+                ($type === 'master' && ($c['masterId'] ?? null) === $id)
+                || ($type === 'release' && ($c['releaseId'] ?? null) === $id);
+
+            if (!$isTarget) {
+                continue;
+            }
+
+            if (!empty($imgs)) {
+                $c['covers'] = $imgs;
+            }
+            if (!empty($years)) {
+                $c['years'] = array_values(array_unique($years));
+            }
+            if ($releaseCountry) {
+                $c['countries'] ??= [];
+                $c['countries'][] = $releaseCountry;
+                $c['countries'] = array_values(array_unique(array_filter($c['countries'])));
+            }
+            if ($artistIdFromDetail) {
+                if (($c['artistId'] ?? null) !== $artistIdFromDetail) {
+                    $c['artistId'] = $artistIdFromDetail;
+                    $this->discogsLogger->info(
+                        $type === 'master' ? 'discogs.master.artist_id_found' : 'discogs.release.artist_id_found',
+                        ['id' => $id, 'artistId' => $artistIdFromDetail]
+                    );
                 }
-                if (!empty($years)) {
-                    $c['years'] = array_values(array_unique($years));
+            }
+            break;
+        }
+    }
+
+    private function extractArtistId(array $detail): ?string
+    {
+        $artists = $detail['artists'] ?? null;
+        if (is_array($artists) && !empty($artists)) {
+            foreach ($artists as $a) {
+                if (isset($a['id']) && $a['id'] !== null && $a['id'] !== '') {
+                    $sid = (string)$a['id'];
+                    if ($sid !== '') {
+                        return $sid;
+                    }
                 }
-                if ($releaseCountry) {
-                    $c['countries'] ??= [];
-                    $c['countries'][] = $releaseCountry;
-                    $c['countries'] = array_values(array_unique(array_filter($c['countries'])));
-                }
-                break;
             }
         }
+
+        return null;
     }
 }

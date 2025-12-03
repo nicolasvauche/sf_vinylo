@@ -2,8 +2,9 @@
 
 namespace App\Form\Vault\Collection;
 
-use App\Dto\Vault\Collection\EditEditionDto;
+use App\Dto\Vault\Collection\ValidateEditionDto;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,7 +15,7 @@ use Symfony\Component\Intl\Countries;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 
-final class CreateType extends AbstractType
+final class ValidateType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -36,18 +37,45 @@ final class CreateType extends AbstractType
             ->add('artistCountryCode', CountryType::class, [
                 'required' => true,
                 'label' => 'Pays',
-                'label_attr' => ['class' => 'form-label'],
-                'attr' => ['class' => 'form-control'],
-                'help_attr' => ['class' => 'help'],
                 'placeholder' => '— Sélectionner —',
                 'preferred_choices' => ['FR', 'US', 'GB', 'DE', 'CA'],
                 'choice_translation_locale' => 'fr',
+                'label_attr' => [
+                    'class' => 'form-label',
+                ],
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+                'help_attr' => [
+                    'class' => 'help',
+                ],
             ])
             ->add('recordTitle', TextType::class, [
                 'required' => true,
                 'label' => 'Titre',
                 'label_attr' => [
                     'class' => 'form-label',
+                ],
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+                'help_attr' => [
+                    'class' => 'help',
+                ],
+            ])
+            ->add('recordFormat', ChoiceType::class, [
+                'required' => true,
+                'label' => 'Format',
+                'label_attr' => [
+                    'class' => 'form-label',
+                ],
+                'choices' => [
+                    '33T' => '33T',
+                    '45T' => '45T',
+                    'Maxi-45T' => 'Maxi45T',
+                    '78T' => '78T',
+                    'Mixte' => 'Mixte',
+                    'Inconnu' => 'Inconnu',
                 ],
                 'attr' => [
                     'class' => 'form-control',
@@ -120,7 +148,7 @@ final class CreateType extends AbstractType
             ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            /** @var EditEditionDto|null $dto */
+            /** @var ValidateEditionDto|null $dto */
             $dto = $event->getData();
             if (!$dto) {
                 return;
@@ -136,7 +164,7 @@ final class CreateType extends AbstractType
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-            /** @var EditEditionDto $dto */
+            /** @var ValidateEditionDto $dto */
             $dto = $event->getData();
             $code = $dto->artistCountryCode ?? null;
 
@@ -155,7 +183,7 @@ final class CreateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => EditEditionDto::class,
+            'data_class' => ValidateEditionDto::class,
         ]);
     }
 }
