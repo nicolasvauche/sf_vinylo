@@ -3,6 +3,8 @@
 .idea/
 vinylo.crt
 vinylo.key
+public/uploads/cover/*
+!public/uploads/cover/.gitkeep
 ###< vinylo/local ###
 
 ###> symfony/framework-bundle ###

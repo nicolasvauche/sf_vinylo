@@ -3,11 +3,7 @@
 {% block title %}Nouveau disque{% endblock %}
 
 {% block main %}
-    <section class="app-section headline">
-        <p>Ajouter un disque</p>
-    </section>
-
     <main class="app-main">
-
+        {% include "vault/collection/add/_form.html.twig" %}
     </main>
 {% endblock %}

@@ -2,6 +2,7 @@
 
 namespace App\Repository\Vault\Catalog;
 
+use App\Entity\Vault\Catalog\Artist;
 use App\Entity\Vault\Catalog\Record;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,20 @@ class RecordRepository extends ServiceEntityRepository
         parent::__construct($registry, Record::class);
     }
 
-    //    /**
-    //     * @return Record[] Returns an array of Record objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Record
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findOneByArtistCanonicalAndYear(
+        Artist $artist,
+        string $titleCanonical,
+        string $yearOriginal
+    ): ?Record {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.artist = :artist')
+            ->andWhere('r.titleCanonical = :canonical')
+            ->andWhere('r.yearOriginal = :year')
+            ->setParameter('artist', $artist)
+            ->setParameter('canonical', $titleCanonical)
+            ->setParameter('year', $yearOriginal)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

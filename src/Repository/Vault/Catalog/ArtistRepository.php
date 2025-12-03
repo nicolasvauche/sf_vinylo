@@ -16,28 +16,34 @@ class ArtistRepository extends ServiceEntityRepository
         parent::__construct($registry, Artist::class);
     }
 
-    //    /**
-    //     * @return Artist[] Returns an array of Artist objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findOneByCanonical(string $canonical): ?Artist
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.nameCanonical = :canonical')
+            ->setParameter('canonical', $canonical)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Artist
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findAllByCanonical(string $canonical): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.nameCanonical = :canonical')
+            ->setParameter('canonical', $canonical)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOneByCanonicalAndCountry(string $canonical, string $countryCode): ?Artist
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.nameCanonical = :canonical')
+            ->andWhere('a.countryCode = :country')
+            ->setParameter('canonical', $canonical)
+            ->setParameter('country', $countryCode)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

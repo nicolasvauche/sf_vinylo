@@ -1,0 +1,36 @@
+{{ form_start(form, {'attr': {'class': 'app-form'}}) }}
+<fieldset class="form-fieldset">
+    <legend class="form-legend">Nouveau disque</legend>
+
+    <div class="form-group">
+        <div class="group-widget">
+            {{ form_label(form.artistName) }}
+            {{ form_widget(form.artistName) }}
+        </div>
+        <div class="group-info">
+            {{ form_help(form.artistName) }}
+            {{ form_errors(form.artistName) }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="group-widget">
+            {{ form_label(form.recordTitle) }}
+            {{ form_widget(form.recordTitle) }}
+        </div>
+        <div class="group-info">
+            {{ form_help(form.recordTitle) }}
+            {{ form_errors(form.recordTitle) }}
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="form-fieldset controls">
+    <div class="app-grid third reverse">
+        <button type="button" class="form-button" title="Dicter votre disque">
+            {{ ux_icon('fa7-solid:microphone-alt', {'class': 'app-icon'}) }}
+        </button>
+        <button type="submit" class="form-submit">Lancer la recherche</button>
+    </div>
+</fieldset>
+{{ form_end(form) }}

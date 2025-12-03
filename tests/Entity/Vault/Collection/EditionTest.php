@@ -16,7 +16,7 @@ final class EditionTest extends TestCase
         $edition = new Edition();
 
         $this->assertNull($edition->getId());
-        $this->assertNull($edition->getCoverUrl());
+        $this->assertNull($edition->getCoverFile());
         $this->assertNull($edition->getCreatedAt());
         $this->assertNull($edition->getUpdatedAt());
         $this->assertNull($edition->getOwner());
@@ -30,17 +30,17 @@ final class EditionTest extends TestCase
         $user = new User();
         $record = (new Record())->setTitle('Legend');
 
-        $coverUrl = 'https://example.test/custom-cover.jpg';
+        $coverFile = 'covers/custom/legend.jpg';
         $createdAt = new \DateTimeImmutable('2025-01-01 10:00:00');
         $updatedAt = new \DateTimeImmutable('2025-01-02 12:34:56');
 
-        $this->assertSame($edition, $edition->setCoverUrl($coverUrl));
+        $this->assertSame($edition, $edition->setCoverFile($coverFile));
         $this->assertSame($edition, $edition->setCreatedAt($createdAt));
         $this->assertSame($edition, $edition->setUpdatedAt($updatedAt));
         $this->assertSame($edition, $edition->setOwner($user));
         $this->assertSame($edition, $edition->setRecord($record));
 
-        $this->assertSame($coverUrl, $edition->getCoverUrl());
+        $this->assertSame($coverFile, $edition->getCoverFile());
         $this->assertSame($createdAt, $edition->getCreatedAt());
         $this->assertSame($updatedAt, $edition->getUpdatedAt());
         $this->assertSame($user, $edition->getOwner());
@@ -69,14 +69,14 @@ final class EditionTest extends TestCase
         $this->assertSame($record2, $edition->getRecord());
     }
 
-    public function testCoverUrlNullable(): void
+    public function testCoverFileNullable(): void
     {
         $edition = new Edition();
 
-        $edition->setCoverUrl('https://example.test/a.jpg');
-        $this->assertSame('https://example.test/a.jpg', $edition->getCoverUrl());
+        $edition->setCoverFile('covers/a.jpg');
+        $this->assertSame('covers/a.jpg', $edition->getCoverFile());
 
-        $edition->setCoverUrl(null);
-        $this->assertNull($edition->getCoverUrl());
+        $edition->setCoverFile(null);
+        $this->assertNull($edition->getCoverFile());
     }
 }

@@ -1,6 +1,24 @@
+::-webkit-scrollbar {
+    width: 0.35rem;
+    height: 0.35rem;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: $secondary;
+    border-radius: 0.25rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: $secondary;
+}
+
 html {
     overflow: hidden;
-    max-width: 380px;
+    max-width: $displayMaxWidth;
     background-color: $black;
 
     @include respondTo(md) {
@@ -11,6 +29,17 @@ html {
         height: 0.5rem;
         background-color: $secondary;
         border-bottom-right-radius: 0.25rem;
+
+        @include respondTo(md) {
+            position: fixed;
+            top: 0;
+            left: max(0px, (100vw - $displayMaxWidth) / 2);
+            right: max(0px, (100vw - $displayMaxWidth) / 2);
+            z-index: 10001;
+            width: calc(100vw - 2 * max(0px, (100vw - $displayMaxWidth) / 2));
+            max-width: $displayMaxWidth;
+            transform-origin: left center !important;
+        }
     }
 
     body {

@@ -20,7 +20,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: min(96vw, 640px);
+        width: min(96vw, calc($displayMaxWidth - 1rem), 640px);
         max-height: 80vh;
         color: $primary;
         background-color: $white;
@@ -35,7 +35,7 @@
 
     &.s .dialog {
         max-height: 70vh;
-        width: min(96vw, 420px);
+        width: min(96vw, calc($displayMaxWidth - 1rem), 420px);
     }
 
     .head, .foot {

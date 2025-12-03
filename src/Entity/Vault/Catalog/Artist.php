@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: ArtistRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_ARTIST', columns: ['name', 'country_code'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_ARTIST', columns: ['name_canonical', 'country_code'])]
 class Artist
 {
     #[ORM\Id]
@@ -21,13 +21,16 @@ class Artist
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Gedmo\Slug(fields: ['name'])]
+    private ?string $nameCanonical = null;
+
+    #[ORM\Column(length: 255)]
+    #[Gedmo\Slug(fields: ['nameCanonical'])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
     private ?string $countryCode = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $countryName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -57,6 +60,19 @@ class Artist
     public function setName(string $name): static
     {
         $this->name = $name;
+        $this->nameCanonical = $this->canonicalize($name);
+
+        return $this;
+    }
+
+    public function getNameCanonical(): ?string
+    {
+        return $this->nameCanonical;
+    }
+
+    public function setNameCanonical(string $nameCanonical): static
+    {
+        $this->nameCanonical = $nameCanonical;
 
         return $this;
     }
@@ -90,7 +106,7 @@ class Artist
         return $this->countryName;
     }
 
-    public function setCountryName(string $countryName): static
+    public function setCountryName(?string $countryName): static
     {
         $this->countryName = $countryName;
 
@@ -137,5 +153,13 @@ class Artist
         }
 
         return $this;
+    }
+
+    private function canonicalize(string $name): string
+    {
+        $n = trim($name);
+        $n = preg_replace('/\s+/u', ' ', $n);
+
+        return mb_strtolower($n, 'UTF-8');
     }
 }

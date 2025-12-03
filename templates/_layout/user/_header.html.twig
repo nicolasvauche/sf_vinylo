@@ -1,5 +1,5 @@
 <header class="app-header">
-    <a href="{{ path('app_flow') }}" {% if not app.user %}disabled="disabled"{% endif %}>
+    <a href="{{ path('app_flow_home') }}" {% if not app.user %}disabled="disabled"{% endif %}>
         <img src="{{ asset('img/logo_flow.png') }}" alt="Flow"/>
         Flow
     </a>
@@ -14,7 +14,7 @@
         </p>
     </div>
 
-    <a href="{{ path('app_vault') }}" {% if not app.user %}disabled="disabled"{% endif %}>
+    <a href="{{ path('app_vault_home') }}" {% if not app.user %}disabled="disabled"{% endif %}>
         <img src="{{ asset('img/logo_vault.png') }}" alt="Vault"/>
         Vault
     </a>

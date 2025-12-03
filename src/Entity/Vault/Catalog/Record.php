@@ -4,13 +4,14 @@ namespace App\Entity\Vault\Catalog;
 
 use App\Entity\Vault\Collection\Edition;
 use App\Repository\Vault\Catalog\RecordRepository;
+use App\ValueObject\Vault\RecordFormat;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: RecordRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_RECORD', columns: ['artist_id', 'title', 'year_original'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_RECORD', columns: ['artist_id', 'title_canonical', 'year_original'])]
 class Record
 {
     #[ORM\Id]
@@ -22,14 +23,20 @@ class Record
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    #[Gedmo\Slug(fields: ['title'])]
+    private ?string $titleCanonical = null;
+
+    #[ORM\Column(length: 255)]
+    #[Gedmo\Slug(fields: ['titleCanonical'])]
     private ?string $slug = null;
+
+    #[ORM\Column(length: 255, options: ['default' => 'Inconnu'])]
+    private string $format = RecordFormat::UNKNOWN->value;
 
     #[ORM\Column(length: 255)]
     private ?string $yearOriginal = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $coverUrl = null;
+    private ?string $coverFile = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverHash = null;
@@ -39,9 +46,6 @@ class Record
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $discogsReleaseId = null;
-
-    #[ORM\Column]
-    private ?int $sourceConfidence = null;
 
     #[ORM\ManyToOne(inversedBy: 'records')]
     #[ORM\JoinColumn(nullable: false)]
@@ -71,6 +75,19 @@ class Record
     public function setTitle(string $title): static
     {
         $this->title = $title;
+        $this->titleCanonical = $this->canonicalize($title);
+
+        return $this;
+    }
+
+    public function getTitleCanonical(): ?string
+    {
+        return $this->titleCanonical;
+    }
+
+    public function setTitleCanonical(string $titleCanonical): static
+    {
+        $this->titleCanonical = $titleCanonical;
 
         return $this;
     }
@@ -87,6 +104,18 @@ class Record
         return $this;
     }
 
+    public function getFormat(): RecordFormat
+    {
+        return RecordFormat::from($this->format);
+    }
+
+    public function setFormat(RecordFormat $format): static
+    {
+        $this->format = $format->value;
+
+        return $this;
+    }
+
     public function getYearOriginal(): ?string
     {
         return $this->yearOriginal;
@@ -99,14 +128,14 @@ class Record
         return $this;
     }
 
-    public function getCoverUrl(): ?string
+    public function getCoverFile(): ?string
     {
-        return $this->coverUrl;
+        return $this->coverFile;
     }
 
-    public function setCoverUrl(?string $coverUrl): static
+    public function setCoverFile(?string $coverFile): static
     {
-        $this->coverUrl = $coverUrl;
+        $this->coverFile = $coverFile;
 
         return $this;
     }
@@ -143,18 +172,6 @@ class Record
     public function setDiscogsReleaseId(?string $discogsReleaseId): static
     {
         $this->discogsReleaseId = $discogsReleaseId;
-
-        return $this;
-    }
-
-    public function getSourceConfidence(): ?int
-    {
-        return $this->sourceConfidence;
-    }
-
-    public function setSourceConfidence(int $sourceConfidence): static
-    {
-        $this->sourceConfidence = $sourceConfidence;
 
         return $this;
     }
@@ -199,5 +216,13 @@ class Record
         }
 
         return $this;
+    }
+
+    private function canonicalize(string $name): string
+    {
+        $n = trim($name);
+        $n = preg_replace('/\s+/u', ' ', $n);
+
+        return mb_strtolower($n, 'UTF-8');
     }
 }

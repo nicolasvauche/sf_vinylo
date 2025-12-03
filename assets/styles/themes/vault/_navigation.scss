@@ -13,6 +13,11 @@
             color: $vault-third;
             background-color: $success;
             border-top-left-radius: 1rem;
+
+            &.active {
+                color: $vault-third;
+                background-color: $vault-fourth;
+            }
         }
 
         &.active {

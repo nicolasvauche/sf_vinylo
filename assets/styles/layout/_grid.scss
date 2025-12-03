@@ -4,4 +4,16 @@
     &.two {
         @include displayGrid(repeat(2, 1fr), 1rem);
     }
+
+    &.third {
+        @include displayGrid(1fr 8rem, 1rem);
+
+        &.alt {
+            @include displayGrid(1fr 5rem, 1rem);
+        }
+
+        &.reverse {
+            @include displayGrid(4rem 1fr, 1rem);
+        }
+    }
 }

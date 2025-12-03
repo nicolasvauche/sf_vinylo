@@ -44,7 +44,7 @@ final class LoginSuccessSubscriber implements EventSubscriberInterface
             )
         );
 
-        $url = $this->urlGenerator->generate('app_flow');
+        $url = $this->urlGenerator->generate('app_flow_home');
         $event->setResponse(new RedirectResponse($url));
     }
 }
