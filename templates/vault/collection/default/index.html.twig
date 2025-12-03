@@ -1,0 +1,56 @@
+{% extends '_layout/vault/_index.html.twig' %}
+
+{% block title %}Votre collection{% endblock %}
+
+{% block main %}
+    <section class="app-section headline">
+        {% if total > 0 %}
+            <p>{{ total }} disque{{ total > 1 ? 's' : '' }} dans votre collection</p>
+        {% else %}
+            <p class="no-result">Votre collection est vide…</p>
+        {% endif %}
+    </section>
+
+    <main class="app-main">
+        {% if total > 0 %}
+            <div class="app-collection app-swipe"
+                 id="swipe-container"
+                 data-controller="collection--swipe"
+                 data-page="{{ page }}"
+                 data-pages="{{ pages }}"
+                 data-url="{{ path('app_vault_home') }}">
+                <span class="app-feedback left">
+                    {{ ux_icon('bxs:up-arrow', {'class': 'app-icon'}) }}
+                    Page suivante
+                </span>
+                <span class="app-feedback right">
+                    {{ ux_icon('bxs:up-arrow', {'class': 'app-icon'}) }}
+                    Page précédente
+                </span>
+
+                {% for edition in items %}
+                    <div class="app-card">
+                        <a href="#" class="playlist" title="Ajouter à une Playlist">
+                            {{ ux_icon('material-symbols:playlist-add-rounded', {'class': 'app-icon'}) }}
+                        </a>
+                        <a href="{{ path('app_vault_edition_details') }}">
+                            <img src="{{ asset(edition.coverFile) }}" class="cover" alt="{{ edition.record.title }}"/>
+                        </a>
+                        <div class="infos">
+                            <div class="details">
+                                <h2>{{ edition.record.title }}</h2>
+                                <h3><a href="#">{{ edition.record.artist.name }}</a></h3>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% include "_layout/vault/_pagination.html.twig" %}
+        {% else %}
+            <p class="no-result">
+                {{ ux_icon('ph:empty-bold', {'class': 'app-icon'}) }}
+            </p>
+        {% endif %}
+    </main>
+{% endblock %}

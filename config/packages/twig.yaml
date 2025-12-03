@@ -3,6 +3,7 @@ twig:
     globals:
         app_locale: '%app.locale%'
         app_userLocationService: '@App\Service\Location\UserLocationService'
+        app_collectionService: '@App\Service\Vault\CollectionService'
 
 when@test:
     twig:

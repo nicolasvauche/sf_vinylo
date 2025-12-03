@@ -1,14 +1,15 @@
-export default class CatalogSwipe {
+export default class CollectionSwipe {
     constructor(containerElement, page, totalPages, url, feedbackElements) {
         this.container = containerElement;
-        this.page = page > 0 ? page : 1;
-        this.totalPages = totalPages;
+        this.page = Number.isFinite(page) ? page : 1;
+        this.totalPages = Number.isFinite(totalPages) ? totalPages : 1;
         this.url = url;
 
         this.threshold = 0.3;
         this.lockThreshold = 10;
         this.clickThreshold = 6;
         this.EPS = 2;
+
         this.startX = 0;
         this.startY = 0;
         this.isDragging = false;
@@ -30,24 +31,45 @@ export default class CatalogSwipe {
 
         this.dragBound = this.drag.bind(this);
         this.stopDragBound = this.stopDrag.bind(this);
+        this.startDragBound = this.startDrag.bind(this);
 
         this.container.style.touchAction = 'pan-y';
 
-        this.container.addEventListener('mousedown', this.startDrag.bind(this));
-        this.container.addEventListener('touchstart', this.startDrag.bind(this), {passive: true});
+        this.container.addEventListener('mousedown', this.startDragBound);
+        this.container.addEventListener('touchstart', this.startDragBound, {passive: true});
     }
 
     setActiveFeedback(name) {
         if (!this.feedbackMap.size) return;
         for (const [key, el] of this.feedbackMap) {
-            if (key === name) el.classList.add('active');
-            else el.classList.remove('active');
+            if (key === name) {
+                el.classList.add('active');
+                el.setAttribute('disabled', 'disabled');
+            } else {
+                el.classList.remove('active');
+                el.removeAttribute('disabled');
+            }
+        }
+    }
+
+    enableActiveFeedback() {
+        for (const el of this.feedbackMap.values()) {
+            if (el.classList.contains('active')) el.removeAttribute('disabled');
+        }
+    }
+
+    disableActiveFeedback() {
+        for (const el of this.feedbackMap.values()) {
+            if (el.classList.contains('active')) el.setAttribute('disabled', 'disabled');
         }
     }
 
     clearFeedback() {
         if (!this.feedbackMap.size) return;
-        for (const el of this.feedbackMap.values()) el.classList.remove('active');
+        for (const el of this.feedbackMap.values()) {
+            el.classList.remove('active');
+            el.removeAttribute('disabled');
+        }
     }
 
     isInteractive(el) {
@@ -80,8 +102,8 @@ export default class CatalogSwipe {
 
         document.addEventListener('mousemove', this.dragBound);
         document.addEventListener('touchmove', this.dragBound, {passive: false});
-        document.addEventListener('mouseup', this.stopDragBound, {passive: false});
-        document.addEventListener('touchend', this.stopDragBound, {passive: false});
+        document.addEventListener('mouseup', this.stopDragBound);
+        document.addEventListener('touchend', this.stopDragBound);
     }
 
     drag(e) {
@@ -101,24 +123,28 @@ export default class CatalogSwipe {
         const absDx = Math.abs(dx);
         const absDy = Math.abs(dy);
 
-        if (absDx <= this.EPS && absDy <= this.EPS) {
-            this.clearFeedback();
-        }
+        const canPrev = this.page > 1;
+        const canNext = this.page < this.totalPages;
+
+        if (absDx <= this.EPS && absDy <= this.EPS) this.clearFeedback();
 
         if (!this.lockedAxis) {
             if (absDx <= this.EPS && absDy <= this.EPS) return;
 
             if (absDx >= absDy) {
+                if ((dx > 0 && !canPrev) || (dx < 0 && !canNext)) {
+                    this.clearFeedback();
+                    return;
+                }
                 if (absDx > this.lockThreshold) {
                     this.lockedAxis = 'x';
                     this.isSwiping = true;
                     if (e.cancelable) e.preventDefault();
-
-                    if (dx >= 0) this.setActiveFeedback('right');
-                    else this.setActiveFeedback('left');
+                    this.setActiveFeedback(dx >= 0 ? 'right' : 'left');
+                    this.disableActiveFeedback();
                 } else {
-                    if (dx >= 0) this.setActiveFeedback('right');
-                    else this.setActiveFeedback('left');
+                    this.setActiveFeedback(dx >= 0 ? 'right' : 'left');
+                    this.disableActiveFeedback();
                     return;
                 }
             } else {
@@ -126,27 +152,47 @@ export default class CatalogSwipe {
             }
         } else if (this.lockedAxis === 'x') {
             if (e.cancelable) e.preventDefault();
+            if ((dx > 0 && !canPrev) || (dx < 0 && !canNext)) {
+                this.clearFeedback();
+                this.container.style.transform = '';
+                this.action = null;
+                return;
+            }
         }
 
         this.container.style.transform = `translate3d(${dx}px,0,0)`;
+        this.setActiveFeedback(dx >= 0 ? 'right' : 'left');
+        this.disableActiveFeedback();
 
-        if (dx >= 0) this.setActiveFeedback('right');
-        else this.setActiveFeedback('left');
-
-        const width = this.container.parentNode ? this.container.parentNode.offsetWidth : this.container.offsetWidth;
+        const width = (this.container.parentNode ? this.container.parentNode.offsetWidth : this.container.offsetWidth) || 1;
         const thresholdPx = this.threshold * width;
 
         if (dx < -thresholdPx) {
-            this.container.classList.remove('swipe-right');
-            this.container.classList.add('swipe-left');
-            this.action = 'next';
+            if (canNext) {
+                this.container.classList.remove('swipe-right');
+                this.container.classList.add('swipe-left');
+                this.action = 'next';
+                this.enableActiveFeedback();
+            } else {
+                this.container.classList.remove('swipe-right', 'swipe-left');
+                this.action = null;
+                this.disableActiveFeedback();
+            }
         } else if (dx > thresholdPx) {
-            this.container.classList.remove('swipe-left');
-            this.container.classList.add('swipe-right');
-            this.action = 'previous';
+            if (canPrev) {
+                this.container.classList.remove('swipe-left');
+                this.container.classList.add('swipe-right');
+                this.action = 'previous';
+                this.enableActiveFeedback();
+            } else {
+                this.container.classList.remove('swipe-right', 'swipe-left');
+                this.action = null;
+                this.disableActiveFeedback();
+            }
         } else {
             this.container.classList.remove('swipe-right', 'swipe-left');
             this.action = null;
+            this.disableActiveFeedback();
         }
     }
 
@@ -162,6 +208,7 @@ export default class CatalogSwipe {
             endX = t ? t.clientX : this.startX;
             endY = t ? t.clientY : this.startY;
         }
+
         const totalDx = Math.abs(endX - this.startX);
         const totalDy = Math.abs(endY - this.startY);
 
@@ -210,19 +257,40 @@ export default class CatalogSwipe {
         this.isSwiping = false;
     }
 
+    blockedBounce(direction = 'none') {
+        const px = direction === 'previous' ? 12 : direction === 'next' ? -12 : 8;
+        this.container.style.transition = 'transform 0.12s ease-out';
+        this.container.style.transform = `translate3d(${px}px,0,0)`;
+        setTimeout(() => this.resetContainer(), 120);
+    }
+
+    navigateTo(page) {
+        const p = Math.max(1, Math.min(page, this.totalPages));
+        const u = new URL(this.url, window.location.origin);
+        u.searchParams.set('page', String(p));
+        window.location.href = u.toString();
+    }
+
     previous() {
-        this.page--;
-        if (this.page <= 0) this.page = this.totalPages;
-        // window.location.href = this.url + '?page=' + this.page;
-        alert('Page précédente');
-        this.resetContainer();
+        if (this.page <= 1) {
+            this.blockedBounce('previous');
+            return;
+        }
+        this.navigateTo(this.page - 1);
     }
 
     next() {
-        this.page++;
-        if (this.page > this.totalPages) this.page = 1;
-        // window.location.href = this.url + '?page=' + this.page;
-        alert('Page suivante');
-        this.resetContainer();
+        if (this.page >= this.totalPages) {
+            this.blockedBounce('next');
+            return;
+        }
+        this.navigateTo(this.page + 1);
+    }
+
+    destroy() {
+        this.teardownListeners();
+        this.clearFeedback();
+        this.container.style.willChange = '';
+        this.container.classList.remove('dragging', 'swipe-right', 'swipe-left');
     }
 }
