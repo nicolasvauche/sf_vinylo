@@ -57,4 +57,14 @@
     color: $primary;
     font-size: .85rem;
     font-style: italic;
+
+    &:has(.app-icon) {
+        text-align: center;
+
+        .app-icon {
+            font-size: 20dvw;
+            color: $primary;
+            opacity: 0.25;
+        }
+    }
 }

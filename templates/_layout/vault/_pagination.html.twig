@@ -1,27 +1,60 @@
-<div class="app-pagination">
+{% set isFirst = page <= 1 %}
+{% set isLast  = page >= pages %}
+{% set window = 5 %}
+{% set half = 2 %}
+{% set start = page - half %}
+{% set end = page + half %}
+
+{% if start < 1 %}
+    {% set end = min(pages, end + (1 - start)) %}
+    {% set start = 1 %}
+{% endif %}
+
+{% if end > pages %}
+    {% set start = max(1, start - (end - pages)) %}
+    {% set end = pages %}
+{% endif %}
+
+{% if (end - start + 1) > window %}
+    {% set end = start + window - 1 %}
+{% endif %}
+
+<div class="app-pagination" role="navigation" aria-label="Pagination">
     <div class="left">
-        <a href="#" class="button">
-            {{ ux_icon('line-md:chevron-double-left', {'class': 'app-icon'}) }}
+        <a href="{{ path('app_vault_home', {page: 1}) }}"
+           class="button {% if isFirst %}hidden{% endif %}"
+           title="Première page">
+            {{ ux_icon('lucide:chevron-first', {'class': 'app-icon'}) }}
         </a>
-        <a href="#" class="button">
-            {{ ux_icon('line-md:chevron-left', {'class': 'app-icon'}) }}
+
+        <a href="{{ path('app_vault_home', {page: page - 1}) }}"
+           class="button {% if isFirst %}hidden{% endif %}"
+           title="Page précédente">
+            {{ ux_icon('lucide:chevron-left', {'class': 'app-icon'}) }}
         </a>
     </div>
 
     <div class="center">
-        <a href="#" class="button">1</a>
-        <a href="#" class="button">2</a>
-        <a href="#" class="button active">3</a>
-        <a href="#" class="button">4</a>
-        <a href="#" class="button">5</a>
+        {% for p in start..end %}
+            {% if p == page %}
+                <span class="button active" aria-current="page">{{ p }}</span>
+            {% else %}
+                <a href="{{ path('app_vault_home', {page: p}) }}" class="button">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
     </div>
 
     <div class="right">
-        <a href="#" class="button">
-            {{ ux_icon('line-md:chevron-right', {'class': 'app-icon'}) }}
+        <a href="{{ path('app_vault_home', {page: page + 1}) }}"
+           class="button {% if isLast %}hidden{% endif %}"
+           title="Page suivante">
+            {{ ux_icon('lucide:chevron-right', {'class': 'app-icon'}) }}
         </a>
-        <a href="#" class="button">
-            {{ ux_icon('line-md:chevron-double-right', {'class': 'app-icon'}) }}
+
+        <a href="{{ path('app_vault_home', {page: pages}) }}"
+           class="button {% if isLast %}hidden{% endif %}"
+           title="Dernière page">
+            {{ ux_icon('lucide:chevron-last', {'class': 'app-icon'}) }}
         </a>
     </div>
 </div>

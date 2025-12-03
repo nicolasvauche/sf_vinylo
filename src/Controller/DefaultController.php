@@ -14,12 +14,6 @@ final class DefaultController extends AbstractController
         return $this->redirectToRoute('app_flow_home');
     }
 
-    #[Route('/vault', name: 'app_vault_home')]
-    public function vault(): Response
-    {
-        return $this->render('default/vault.html.twig');
-    }
-
     #[Route('/vault/disque/details', name: 'app_vault_edition_details')]
     public function details(): Response
     {
