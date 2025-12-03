@@ -15,6 +15,7 @@ public/uploads/cover/*
 /public/bundles/
 /var/
 /vendor/
+config/reference.php
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
