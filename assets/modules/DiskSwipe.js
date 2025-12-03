@@ -39,14 +39,34 @@ export default class DiskSwipe {
     setActiveFeedback(name) {
         if (!this.feedbackMap.size) return;
         for (const [key, el] of this.feedbackMap) {
-            if (key === name) el.classList.add('active');
-            else el.classList.remove('active');
+            if (key === name) {
+                el.classList.add('active');
+                el.setAttribute('disabled', 'disabled');
+            } else {
+                el.classList.remove('active');
+                el.removeAttribute('disabled');
+            }
+        }
+    }
+
+    enableActiveFeedback() {
+        for (const el of this.feedbackMap.values()) {
+            if (el.classList.contains('active')) el.removeAttribute('disabled');
+        }
+    }
+
+    disableActiveFeedback() {
+        for (const el of this.feedbackMap.values()) {
+            if (el.classList.contains('active')) el.setAttribute('disabled', 'disabled');
         }
     }
 
     clearFeedback() {
         if (!this.feedbackMap.size) return;
-        for (const el of this.feedbackMap.values()) el.classList.remove('active');
+        for (const el of this.feedbackMap.values()) {
+            el.classList.remove('active');
+            el.removeAttribute('disabled');
+        }
     }
 
     initEventListeners() {
@@ -151,8 +171,10 @@ export default class DiskSwipe {
                         if (dx >= 0) this.setActiveFeedback('right');
                         else if (!this.playOnly && this.from !== 'playlist') this.setActiveFeedback('left');
                         else this.clearFeedback();
+                        this.disableActiveFeedback();
                     } else if (dy < 0 && !this.playOnly) {
                         this.setActiveFeedback('top');
+                        this.disableActiveFeedback();
                     } else {
                         this.clearFeedback();
                     }
@@ -171,18 +193,25 @@ export default class DiskSwipe {
 
             if (dx >= 0) {
                 this.setActiveFeedback('right');
+                this.disableActiveFeedback();
             } else {
-                if (this.from !== 'playlist' && !this.playOnly) this.setActiveFeedback('left');
-                else this.clearFeedback();
+                if (this.from !== 'playlist' && !this.playOnly) {
+                    this.setActiveFeedback('left');
+                    this.disableActiveFeedback();
+                } else {
+                    this.clearFeedback();
+                }
             }
 
             if (dx > thresholdPx) {
                 this.action = 'play';
                 this.card.classList.add('swipe-right');
+                this.enableActiveFeedback();
             } else if (dx < -thresholdPx) {
                 if (this.from !== 'playlist' && !this.playOnly) {
                     this.action = 'cancel';
                     this.card.classList.add('swipe-left');
+                    this.enableActiveFeedback();
                 }
             }
             return;
@@ -198,12 +227,16 @@ export default class DiskSwipe {
                 return;
             }
 
-            if (!this.playOnly) this.setActiveFeedback('top');
+            if (!this.playOnly) {
+                this.setActiveFeedback('top');
+                this.disableActiveFeedback();
+            }
             this.card.style.transform = `translate3d(0,${effectiveDy}px,0)`;
 
             if (!this.playOnly && Math.abs(effectiveDy) > thresholdPx) {
                 this.action = 'view';
                 this.card.classList.add('swipe-up');
+                this.enableActiveFeedback();
             }
         }
     }
@@ -297,7 +330,6 @@ export default class DiskSwipe {
         setTimeout(() => card.style.transition = '', 0);
     }
 
-    // --- Actions
     cancel() {
         this.card.classList.add('swipe-left');
         alert('Refus de la suggestion');
