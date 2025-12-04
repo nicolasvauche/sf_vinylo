@@ -35,7 +35,7 @@
                         <a href="#" class="playlist" title="Ajouter à une Playlist">
                             {{ ux_icon('material-symbols:playlist-add-rounded', {'class': 'app-icon'}) }}
                         </a>
-                        <a href="{{ path('app_vault_edition_details') }}">
+                        <a href="{{ path('app_vault_edition_details', {'id': edition.id}) }}">
                             <img src="{{ asset(edition.coverFile) }}" class="cover" alt="{{ edition.record.title }}"/>
                         </a>
                         <div class="infos">

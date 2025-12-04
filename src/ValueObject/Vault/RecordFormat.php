@@ -21,4 +21,16 @@ enum RecordFormat: string
             default => self::UNKNOWN,
         };
     }
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::F33 => '33T',
+            self::F45 => '45T',
+            self::F45_MAXI => 'Maxi 45T',
+            self::F78 => '78T',
+            self::MIXED => 'Mixte',
+            self::UNKNOWN => '',
+        };
+    }
 }

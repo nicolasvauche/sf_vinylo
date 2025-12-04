@@ -373,14 +373,14 @@ export default class DiskSwipe {
 
     goback() {
         this.instantResetForNav();
-        const ref = document.referrer || '';
-        if (ref.includes('/vault')) {
-            window.location.href = '/vault';
-        } else if (ref.includes('/flow')) {
-            window.location.href = '/flow';
-        } else {
-            window.location.href = '/flow';
+
+        const prevUrl = sessionStorage.getItem('vault:returnUrl');
+        if (prevUrl) {
+            window.location.assign(prevUrl);
+            return;
         }
+
+        history.go(-1);
     }
 
     delete() {
