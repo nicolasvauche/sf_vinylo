@@ -16,13 +16,22 @@ export default class extends Controller {
             );
 
             const modal = document.getElementById('app-modal');
-            modal.addEventListener("modal:closed", (e) => {
-                const reason = e.detail?.reason;
 
+            this.onModalClosed = (e) => {
+                const reason = e.detail?.reason;
                 if (["cancel", "overlay", "esc"].includes(reason)) {
                     this.swipe.resetCard();
                 }
-            });
+            };
+
+            if (modal) modal.addEventListener("modal:closed", this.onModalClosed);
+            this.modalEl = modal;
+        }
+    }
+
+    disconnect() {
+        if (this.modalEl && this.onModalClosed) {
+            this.modalEl.removeEventListener('modal:closed', this.onModalClosed);
         }
     }
 }

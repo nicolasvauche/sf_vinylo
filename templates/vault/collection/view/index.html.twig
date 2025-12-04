@@ -1,19 +1,23 @@
 {% extends '_layout/vault/_index.html.twig' %}
 
-{% block title %}Détails d'un disque{% endblock %}
+{% block title %}Détails du disque{% endblock %}
 
 {% block main %}
-    <main class="app-main app-disks" data-controller="disk--swipe">
+    <main
+        class="app-main app-disks"
+        data-controller="disk--swipe"
+        data-disk--swipe-from-value="vault">
         <section
             class="app-section app-disk"
             data-id="1"
             data-from="vault"
             data-title="Supprimer un disque"
             data-confirm-url="{{ path('modal_confirm', {
-                message: 'Confirmez-vous la suppression du dique <strong>Legend - The Best Of Bob Marley And The Wailers</strong>&nbsp;?<br>Cette action est définitive…'
+                message: 'Confirmez-vous la suppression du disque <strong>' ~ edition.record.title ~ '</strong>&nbsp;?<br>Cette action est définitive…'
             }) }}"
-            data-action-url="{{ path('app_vault_edition_delete') }}">
-            <img src="{{ asset('img/cover.jpg') }}" alt="Disque"/>
+            data-action-url="{{ path('app_vault_edition_delete') }}"
+            data-disk--swipe-target="card">
+            <img src="{{ asset(edition.coverFile) }}" alt="{{ edition.record.title }}"/>
 
             <span class="app-feedback top">
                 {{ ux_icon('el:arrow-up', {'class': 'app-icon'}) }}
@@ -31,9 +35,16 @@
             <div class="infos">
                 <header>
                     <div class="details">
-                        <h2>Legend - The Best Of Bob Marley And The Wailers</h2>
+                        <h2>
+                            {{ edition.record.title }}
+                            <small>
+                                <em>
+                                    {{ edition.record.yearOriginal }}&nbsp;•&nbsp;{{ edition.format.label }}
+                                </em>
+                            </small>
+                        </h2>
                         <h3>
-                            <a href="#">Bob Marley & The Wailers</a>
+                            <a href="#">{{ edition.record.artist.name }}</a>
                         </h3>
                     </div>
                     <button

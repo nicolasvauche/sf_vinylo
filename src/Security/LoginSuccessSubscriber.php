@@ -13,7 +13,7 @@ final class LoginSuccessSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private UrlGeneratorInterface $urlGenerator,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -27,22 +27,26 @@ final class LoginSuccessSubscriber implements EventSubscriberInterface
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
         $user = $event->getUser();
-
         if (!$user instanceof User) {
             return;
         }
 
+        $isFirstLogin = $user->getLastLoginAt() === null;
         $user->setLastLoginAt(new \DateTimeImmutable());
         $this->em->flush();
 
         $session = $event->getRequest()->getSession();
-        $session?->getFlashBag()->add(
-            'success',
-            sprintf(
-                'Heureux de vous revoir, %s&nbsp;!',
-                $user->getPseudo() ?: ''
-            )
-        );
+        if ($isFirstLogin) {
+            $session?->getFlashBag()->add(
+                'success',
+                sprintf('Bienvenue %s&nbsp;!', $user->getPseudo() ?: '')
+            );
+        } else {
+            $session?->getFlashBag()->add(
+                'success',
+                sprintf('Heureux de vous revoir, %s&nbsp;!', $user->getPseudo() ?: '')
+            );
+        }
 
         $url = $this->urlGenerator->generate('app_flow_home');
         $event->setResponse(new RedirectResponse($url));
