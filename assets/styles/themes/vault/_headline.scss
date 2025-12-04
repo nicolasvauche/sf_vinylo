@@ -1,6 +1,7 @@
 .app-section {
     &.headline {
         margin: 0.5rem 0;
+        color: $vault-primary;
 
         & > .no-result {
             margin: 0;

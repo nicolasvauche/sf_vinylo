@@ -5,7 +5,9 @@
 {% block main %}
     <section class="app-section headline">
         {% if total > 0 %}
-            <p>{{ total }} disque{{ total > 1 ? 's' : '' }} dans votre collection</p>
+            <p>
+                <strong>{{ total }} disque{{ total > 1 ? 's' : '' }} dans votre collection</strong>
+            </p>
         {% else %}
             <p class="no-result">Votre collection est vide…</p>
         {% endif %}
